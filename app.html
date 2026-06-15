@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bolão Copa 2026 — App</title>
+  <title>Bolão Copa 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/global.css">
@@ -11,14 +11,13 @@
 </head>
 <body>
 
-  <!-- TOPBAR -->
   <header class="topbar">
     <div class="topbar-brand">
-      <span class="topbar-trophy" aria-hidden="true">🏆</span>
+      <span class="topbar-trophy">🏆</span>
       <span class="topbar-title">Bolão Copa <strong>2026</strong></span>
     </div>
     <div class="topbar-actions">
-      <button class="btn-dark-toggle" id="darkToggle" onclick="toggleDarkMode()" aria-label="Alternar modo escuro">
+      <button class="btn-dark-toggle" id="darkToggle" onclick="toggleDarkMode()">
         <span id="darkIcon">🌙</span>
         <span id="darkLabel">Escuro</span>
       </button>
@@ -27,7 +26,7 @@
         <div class="user-dropdown" id="userDropdown">
           <div class="user-info">
             <strong id="dropdownName">Usuário</strong>
-            <small id="dropdownEmail">email@email.com</small>
+            <small id="dropdownEmail"></small>
           </div>
           <hr>
           <button onclick="doLogout()">Sair</button>
@@ -36,185 +35,495 @@
     </div>
   </header>
 
-  <!-- NAV -->
-  <nav class="nav-tabs" role="tablist">
-    <button class="nav-tab active" role="tab" data-page="brackets" onclick="switchPage('brackets', this)">
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-page="brackets" onclick="switchPage('brackets', this)">
       <span class="nav-icon">🗂</span><span>Chaveamento</span>
     </button>
-    <button class="nav-tab" role="tab" data-page="pickem" onclick="switchPage('pickem', this)">
+    <button class="nav-tab" data-page="pickem" onclick="switchPage('pickem', this)">
       <span class="nav-icon">🎯</span><span>Meus Palpites</span>
     </button>
-    <button class="nav-tab" role="tab" data-page="ranking" onclick="switchPage('ranking', this)">
+    <button class="nav-tab" data-page="ranking" onclick="switchPage('ranking', this)">
       <span class="nav-icon">🏅</span><span>Ranking</span>
     </button>
   </nav>
 
-  <!-- PAGES -->
   <main class="app-main">
 
-    <!-- ===== BRACKETS ===== -->
-    <section class="page active" id="page-brackets" role="tabpanel">
+    <section class="page active" id="page-brackets">
       <div class="page-header">
         <h2>Copa do Mundo <span class="gold">2026</span></h2>
-        <div class="live-pill">
-          <span class="live-dot" aria-hidden="true"></span>
-          Dados em tempo real
-        </div>
+        <div class="live-pill"><span class="live-dot"></span>Dados em tempo real</div>
       </div>
-
-      <!-- GROUPS SECTION -->
       <div class="section-label">Fase de Grupos</div>
       <div id="groupsGrid" class="groups-grid">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          Carregando grupos...
-        </div>
+        <div class="loading-state"><div class="spinner"></div> Carregando grupos...</div>
       </div>
-
-      <!-- KNOCKOUT SECTION -->
       <div class="section-label" style="margin-top:2rem">Mata-Mata</div>
       <div id="knockoutTree" class="knockout-wrapper">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          Carregando chaveamento...
-        </div>
+        <div class="loading-state"><div class="spinner"></div> Carregando chaveamento...</div>
       </div>
     </section>
 
-    <!-- ===== PICK'EM ===== -->
-    <section class="page" id="page-pickem" role="tabpanel">
+    <section class="page" id="page-pickem">
       <div class="page-header">
         <h2>🎯 Meus Palpites</h2>
-        <button class="btn-save-all" onclick="saveAllPicks()">
-          💾 Salvar tudo
-        </button>
+        <button class="btn-save-all" onclick="saveAllPicks()">💾 Salvar tudo</button>
       </div>
-
-      <!-- SCORE BANNER -->
       <div class="score-banner">
-        <div class="score-stat">
-          <div class="score-val gold" id="statPts">0</div>
-          <div class="score-lbl">Pontos</div>
-        </div>
-        <div class="score-stat">
-          <div class="score-val green" id="statCorrect">0</div>
-          <div class="score-lbl">Acertos</div>
-        </div>
-        <div class="score-stat">
-          <div class="score-val red" id="statWrong">0</div>
-          <div class="score-lbl">Erros</div>
-        </div>
-        <div class="score-stat">
-          <div class="score-val muted" id="statPending">0</div>
-          <div class="score-lbl">Pendentes</div>
-        </div>
+        <div class="score-stat"><div class="score-val gold" id="statPts">0</div><div class="score-lbl">Pontos</div></div>
+        <div class="score-stat"><div class="score-val green" id="statCorrect">0</div><div class="score-lbl">Acertos</div></div>
+        <div class="score-stat"><div class="score-val red" id="statWrong">0</div><div class="score-lbl">Erros</div></div>
+        <div class="score-stat"><div class="score-val muted" id="statPending">0</div><div class="score-lbl">Pendentes</div></div>
       </div>
-
       <div id="pickemGrid" class="pickem-grid">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          Carregando jogos...
-        </div>
+        <div class="loading-state"><div class="spinner"></div> Carregando jogos...</div>
       </div>
     </section>
 
-    <!-- ===== RANKING ===== -->
-    <section class="page" id="page-ranking" role="tabpanel">
+    <section class="page" id="page-ranking">
       <div class="page-header">
         <h2>🏅 Ranking Geral</h2>
         <button class="btn-outline-sm" onclick="loadRanking()">↻ Atualizar</button>
       </div>
       <div id="rankingList">
-        <div class="loading-state">
-          <div class="spinner"></div>
-          Carregando ranking...
-        </div>
+        <div class="loading-state"><div class="spinner"></div> Carregando ranking...</div>
       </div>
     </section>
 
   </main>
 
- <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <script>
-    // Config inline — sem depender de config.js externo
-    const SUPABASE_URL = 'https://olzcsczypoaqpntzfbsv.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_GD9R_nDQNxlZY5F0lNaCnw_CUAKm6eX';
-    const FD_BASE = 'https://api.football-data.org/v4';
-    const FD_TOKEN = '06f91a53d7ff4718a498803703571a46';
-    const WC_COMPETITION_ID = 2000;
+  // ===== GLOBALS =====
+  const SUPABASE_URL = 'https://olzcsczypoaqpntzfbsv.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_GD9R_nDQNxlZY5F0lNaCnw_CUAKm6eX';
+  const FD_BASE = 'https://api.football-data.org/v4';
+  const FD_TOKEN = '06f91a53d7ff4718a498803703571a46';
+  const WC_COMPETITION_ID = 2000;
 
-    let supabase;
-    let currentUser = null;
-    let currentProfile = null;
+  let sb, currentUser, currentProfile;
+  let pickemMatches = [], userPicks = {}, pickemLoaded = false;
+  const _cache = {};
 
-    const _cache = {};
-    async function cachedFD(path, ttlMs = 5 * 60 * 1000) {
-      const key = 'fd:' + path;
-      const now = Date.now();
-      if (_cache[key] && now - _cache[key].ts < ttlMs) return _cache[key].data;
-      const data = await apiFD(path);
-      if (data) _cache[key] = { data, ts: now };
-      return data;
-    }
+  const FLAGS = {
+    'Brazil':'🇧🇷','Germany':'🇩🇪','France':'🇫🇷','Argentina':'🇦🇷','Spain':'🇪🇸',
+    'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪',
+    'Italy':'🇮🇹','Uruguay':'🇺🇾','Mexico':'🇲🇽','United States':'🇺🇸','USA':'🇺🇸',
+    'Canada':'🇨🇦','Japan':'🇯🇵','South Korea':'🇰🇷','Korea Republic':'🇰🇷',
+    'Australia':'🇦🇺','Morocco':'🇲🇦','Senegal':'🇸🇳','Ecuador':'🇪🇨',
+    'Croatia':'🇭🇷','Switzerland':'🇨🇭','Poland':'🇵🇱','Denmark':'🇩🇰',
+    'Serbia':'🇷🇸','Saudi Arabia':'🇸🇦','Iran':'🇮🇷','Cameroon':'🇨🇲',
+    'Tunisia':'🇹🇳','Qatar':'🇶🇦','Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿','Costa Rica':'🇨🇷',
+    'Ghana':'🇬🇭','Colombia':'🇨🇴'
+  };
+  function getFlag(n) { return FLAGS[n] || '🏳️'; }
+  function initials(n) {
+    if (!n) return '??';
+    const p = n.trim().split(' ');
+    return p.length === 1 ? p[0].slice(0,2).toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
+  }
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+  async function apiFD(path) {
+    try {
+      const r = await fetch(FD_BASE + path, { headers: { 'X-Auth-Token': FD_TOKEN } });
+      if (!r.ok) return null;
+      return r.json();
+    } catch(e) { return null; }
+  }
+  async function cachedFD(path, ttl = 300000) {
+    const k = 'fd:'+path, now = Date.now();
+    if (_cache[k] && now - _cache[k].ts < ttl) return _cache[k].data;
+    const d = await apiFD(path);
+    if (d) _cache[k] = { data: d, ts: now };
+    return d;
+  }
 
-    async function apiFD(path) {
-      try {
-        const res = await fetch(FD_BASE + path, { headers: { 'X-Auth-Token': FD_TOKEN } });
-        if (!res.ok) return null;
-        return res.json();
-      } catch(e) { return null; }
-    }
+  // ===== INIT =====
+  window.addEventListener('DOMContentLoaded', async function() {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(el._t);
-      el._t = setTimeout(() => el.classList.remove('show'), 3500);
-    }
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
 
-    function initials(name) {
-      if (!name) return '??';
-      const p = name.trim().split(' ');
-      return p.length === 1 ? p[0].slice(0,2).toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
-    }
+    currentUser = session.user;
 
-    const FLAGS = {
-      'Brazil':'🇧🇷','Germany':'🇩🇪','France':'🇫🇷','Argentina':'🇦🇷','Spain':'🇪🇸',
-      'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪',
-      'Italy':'🇮🇹','Uruguay':'🇺🇾','Mexico':'🇲🇽','United States':'🇺🇸','USA':'🇺🇸',
-      'Canada':'🇨🇦','Japan':'🇯🇵','South Korea':'🇰🇷','Korea Republic':'🇰🇷',
-      'Australia':'🇦🇺','Morocco':'🇲🇦','Senegal':'🇸🇳','Ghana':'🇬🇭',
-      'Ecuador':'🇪🇨','Croatia':'🇭🇷','Switzerland':'🇨🇭','Poland':'🇵🇱',
-      'Denmark':'🇩🇰','Serbia':'🇷🇸','Colombia':'🇨🇴','Saudi Arabia':'🇸🇦',
-      'Iran':'🇮🇷','Cameroon':'🇨🇲','Tunisia':'🇹🇳','Qatar':'🇶🇦','Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿',
-      'Costa Rica':'🇨🇷','Ghana':'🇬🇦'
-    };
-    function getFlag(name) { return FLAGS[name] || '🏳️'; }
-
-    window.addEventListener('DOMContentLoaded', async function() {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
-
-      currentUser = session.user;
-      await loadProfile();
-      initDarkMode();
-      initUserMenu();
-      loadBrackets();
+    sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') window.location.href = 'index.html';
     });
 
-    supabase = null; // será inicializado no DOMContentLoaded
+    await loadProfile();
+    initDarkMode();
+    initUserMenu();
+    loadBrackets();
+  });
+
+  // ===== PROFILE =====
+  async function loadProfile() {
+    const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (data) { currentProfile = data; return; }
+    const name = currentUser.user_metadata?.name || currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Usuário';
+    const p = { id: currentUser.id, name, email: currentUser.email, avatar_url: currentUser.user_metadata?.avatar_url || null, created_at: new Date().toISOString() };
+    await sb.from('profiles').upsert(p);
+    currentProfile = p;
+  }
+
+  function initUserMenu() {
+    const name = currentProfile?.name || 'Usuário';
+    document.getElementById('userAvatar').textContent = initials(name);
+    document.getElementById('dropdownName').textContent = name;
+    document.getElementById('dropdownEmail').textContent = currentProfile?.email || currentUser?.email || '';
+    document.getElementById('userAvatar').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('open');
+    });
+    document.addEventListener('click', () => document.getElementById('userDropdown').classList.remove('open'));
+  }
+
+  async function doLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  // ===== DARK MODE =====
+  function initDarkMode() {
+    if (localStorage.getItem('bolao_dark') === 'true') applyDark(true);
+  }
+  function toggleDarkMode() { applyDark(!document.body.classList.contains('dark')); }
+  function applyDark(on) {
+    document.body.classList.toggle('dark', on);
+    localStorage.setItem('bolao_dark', on);
+    document.getElementById('darkIcon').textContent = on ? '☀️' : '🌙';
+    document.getElementById('darkLabel').textContent = on ? 'Claro' : 'Escuro';
+  }
+
+  // ===== NAVIGATION =====
+  function switchPage(id, btn) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+id).classList.add('active');
+    if (id === 'pickem') loadPickem();
+    if (id === 'ranking') loadRanking();
+  }
+
+  // ===== BRACKETS =====
+  const FALLBACK_GROUPS = [
+    {id:'A',teams:[{n:'Netherlands',p:9,pj:3,gf:5,gc:1},{n:'Ecuador',p:4,pj:3,gf:3,gc:4},{n:'Senegal',p:4,pj:3,gf:5,gc:4},{n:'Qatar',p:0,pj:3,gf:1,gc:7}]},
+    {id:'B',teams:[{n:'England',p:5,pj:3,gf:9,gc:2},{n:'USA',p:5,pj:3,gf:2,gc:1},{n:'Iran',p:3,pj:3,gf:4,gc:7},{n:'Wales',p:1,pj:3,gf:1,gc:6}]},
+    {id:'C',teams:[{n:'Argentina',p:6,pj:3,gf:5,gc:2},{n:'Poland',p:4,pj:3,gf:2,gc:2},{n:'Mexico',p:4,pj:3,gf:2,gc:3},{n:'Saudi Arabia',p:4,pj:3,gf:3,gc:5}]},
+    {id:'D',teams:[{n:'France',p:6,pj:3,gf:6,gc:3},{n:'Australia',p:6,pj:3,gf:5,gc:4},{n:'Tunisia',p:4,pj:3,gf:1,gc:1},{n:'Denmark',p:1,pj:3,gf:1,gc:5}]},
+    {id:'E',teams:[{n:'Japan',p:6,pj:3,gf:4,gc:3},{n:'Spain',p:4,pj:3,gf:9,gc:3},{n:'Germany',p:4,pj:3,gf:6,gc:5},{n:'Costa Rica',p:3,pj:3,gf:3,gc:11}]},
+    {id:'F',teams:[{n:'Morocco',p:7,pj:3,gf:4,gc:1},{n:'Croatia',p:5,pj:3,gf:4,gc:1},{n:'Belgium',p:3,pj:3,gf:1,gc:2},{n:'Canada',p:0,pj:3,gf:2,gc:7}]},
+    {id:'G',teams:[{n:'Brazil',p:6,pj:3,gf:3,gc:1},{n:'Switzerland',p:6,pj:3,gf:4,gc:3},{n:'Cameroon',p:4,pj:3,gf:4,gc:4},{n:'Serbia',p:1,pj:3,gf:5,gc:8}]},
+    {id:'H',teams:[{n:'Portugal',p:6,pj:3,gf:8,gc:4},{n:'South Korea',p:4,pj:3,gf:4,gc:4},{n:'Uruguay',p:4,pj:3,gf:2,gc:3},{n:'Ghana',p:3,pj:3,gf:5,gc:7}]},
+  ];
+  const FALLBACK_KO = {
+    r16:[
+      {h:'Netherlands',a:'USA',hs:3,as:1,done:true},{h:'Argentina',a:'Australia',hs:2,as:1,done:true},
+      {h:'France',a:'Poland',hs:3,as:1,done:true},{h:'England',a:'Senegal',hs:3,as:0,done:true},
+      {h:'Japan',a:'Croatia',hs:1,as:1,pen:'Croatia',done:true},{h:'Brazil',a:'South Korea',hs:4,as:1,done:true},
+      {h:'Morocco',a:'Spain',hs:0,as:0,pen:'Morocco',done:true},{h:'Portugal',a:'Switzerland',hs:6,as:1,done:true},
+    ],
+    qf:[
+      {h:'Netherlands',a:'Argentina',hs:2,as:2,pen:'Argentina',done:true},{h:'France',a:'England',hs:2,as:1,done:true},
+      {h:'Croatia',a:'Brazil',hs:1,as:1,pen:'Croatia',done:true},{h:'Morocco',a:'Portugal',hs:1,as:0,done:true},
+    ],
+    sf:[{h:'Argentina',a:'Croatia',hs:3,as:0,done:true},{h:'France',a:'Morocco',hs:2,as:0,done:true}],
+    final:[{h:'Argentina',a:'France',hs:3,as:3,pen:'Argentina',done:true}],
+    champion:'Argentina'
+  };
+
+  async function loadBrackets() {
+    const standing = await cachedFD('/competitions/'+WC_COMPETITION_ID+'/standings');
+    if (standing?.standings) renderGroups(parseAPIGroups(standing.standings));
+    else renderGroups(FALLBACK_GROUPS);
+    const fin = await cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=FINAL');
+    if (fin?.matches?.length) {
+      const [r16,qf,sf] = await Promise.all([
+        cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=LAST_16'),
+        cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=QUARTER_FINALS'),
+        cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=SEMI_FINALS'),
+      ]);
+      renderKnockout(parseAPIKO(r16,qf,sf,fin));
+    } else renderKnockout(FALLBACK_KO);
+  }
+
+  function parseAPIGroups(standings) {
+    return standings.filter(s=>s.type==='TOTAL').map(s=>({
+      id: s.group?.replace('GROUP_','') || '?',
+      teams: s.table.map(r=>({n:r.team.name,p:r.points,pj:r.playedGames,gf:r.goalsFor,gc:r.goalsAgainst}))
+    }));
+  }
+  function parseAPIKO(r16d,qfd,sfd,find) {
+    function pm(d) {
+      if (!d?.matches) return [];
+      return d.matches.map(m=>{
+        const done=m.status==='FINISHED';
+        const hs=m.score?.fullTime?.home??0, as=m.score?.fullTime?.away??0;
+        const pen=m.score?.penalties?.home>m.score?.penalties?.away?m.homeTeam?.name:m.score?.penalties?.away>m.score?.penalties?.home?m.awayTeam?.name:null;
+        return {h:m.homeTeam?.name||'TBD',a:m.awayTeam?.name||'TBD',hs:done?hs:null,as:done?as:null,pen,done};
+      });
+    }
+    const finals=pm(find);
+    const champ=finals[0]?.done?(finals[0].pen||(finals[0].hs>finals[0].as?finals[0].h:finals[0].a)):'?';
+    return {r16:pm(r16d),qf:pm(qfd),sf:pm(sfd),final:finals,champion:champ};
+  }
+
+  function renderGroups(groups) {
+    const el=document.getElementById('groupsGrid');
+    el.innerHTML=groups.map(g=>`
+      <div class="group-card">
+        <div class="group-card-head"><h3>Grupo ${g.id}</h3><span>${g.teams[0]?.pj||3} jogos</span></div>
+        <table class="group-table">
+          <thead><tr><th>Time</th><th>PJ</th><th>SG</th><th>Pts</th></tr></thead>
+          <tbody>${g.teams.sort((a,b)=>b.p-a.p||(b.gf-b.gc)-(a.gf-a.gc)).map((t,i)=>`
+            <tr><td><div class="team-cell">
+              <div class="${i<2?'qualified-marker':'eliminated-marker'}"></div>
+              <span class="flag">${getFlag(t.n)}</span>
+              <span class="team-name">${t.n}</span>
+            </div></td>
+            <td>${t.pj}</td><td>${(t.gf-t.gc)>=0?'+'+(t.gf-t.gc):t.gf-t.gc}</td><td><strong>${t.p}</strong></td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>`).join('');
+  }
+
+  function renderKnockout(ko) {
+    const el=document.getElementById('knockoutTree');
+    const rounds=[{l:'Oitavas',m:ko.r16},{l:'Quartas',m:ko.qf},{l:'Semifinal',m:ko.sf},{l:'Final',m:ko.final}];
+    let html='<div class="knockout-tree">';
+    rounds.forEach((r,ri)=>{
+      html+=`<div class="ko-round"><div class="ko-round-label">${r.l}</div><div class="ko-matches">`;
+      r.m.forEach(m=>{
+        const hw=m.done&&(m.pen?m.pen===m.h:m.hs>m.as);
+        const aw=m.done&&(m.pen?m.pen===m.a:m.as>m.hs);
+        html+=`<div class="ko-match${ri===3?' final-match':''}">
+          <div class="ko-team ${hw?'winner':m.done?'loser':''}">
+            <div class="ko-team-info"><span>${getFlag(m.h)}</span><span class="ko-team-name">${m.h}</span></div>
+            ${m.done?`<span class="ko-score">${m.hs}${m.pen===m.h?'<span class="ko-pen">P</span>':''}</span>`:''}
+          </div>
+          <div class="ko-team ${aw?'winner':m.done?'loser':''}">
+            <div class="ko-team-info"><span>${getFlag(m.a)}</span><span class="ko-team-name">${m.a}</span></div>
+            ${m.done?`<span class="ko-score">${m.as}${m.pen===m.a?'<span class="ko-pen">P</span>':''}</span>`:''}
+          </div>
+        </div>`;
+      });
+      html+='</div></div>';
+    });
+    html+=`<div class="ko-round champion-col"><div class="ko-round-label">Campeão</div><div class="ko-matches">
+      <div class="champion-box"><span class="champion-trophy">🏆</span><div class="champion-label">Campeão</div>
+      <div class="champion-name">${getFlag(ko.champion)} ${ko.champion}</div></div>
+    </div></div></div>`;
+    el.innerHTML=html;
+  }
+
+  // ===== PICK'EM =====
+  const FALLBACK_PICKEM = [
+    {id:'f_final',label:'Final',home:'Argentina',away:'France',status:'done',winner:'Argentina',homeScore:3,awayScore:3},
+    {id:'f_sf1',label:'Semifinal',home:'Argentina',away:'Croatia',status:'done',winner:'Argentina',homeScore:3,awayScore:0},
+    {id:'f_sf2',label:'Semifinal',home:'France',away:'Morocco',status:'done',winner:'France',homeScore:2,awayScore:0},
+    {id:'f_qf1',label:'Quartas de Final',home:'Netherlands',away:'Argentina',status:'done',winner:'Argentina',homeScore:2,awayScore:2},
+    {id:'f_qf2',label:'Quartas de Final',home:'France',away:'England',status:'done',winner:'France',homeScore:2,awayScore:1},
+    {id:'f_qf3',label:'Quartas de Final',home:'Croatia',away:'Brazil',status:'done',winner:'Croatia',homeScore:1,awayScore:1},
+    {id:'f_qf4',label:'Quartas de Final',home:'Morocco',away:'Portugal',status:'done',winner:'Morocco',homeScore:1,awayScore:0},
+    {id:'f_r1',label:'Oitavas de Final',home:'Brazil',away:'South Korea',status:'done',winner:'Brazil',homeScore:4,awayScore:1},
+    {id:'f_r2',label:'Oitavas de Final',home:'Morocco',away:'Spain',status:'done',winner:'Morocco',homeScore:0,awayScore:0},
+    {id:'f_r3',label:'Oitavas de Final',home:'Portugal',away:'Switzerland',status:'done',winner:'Portugal',homeScore:6,awayScore:1},
+    {id:'f_r4',label:'Oitavas de Final',home:'England',away:'Senegal',status:'done',winner:'England',homeScore:3,awayScore:0},
+    {id:'f_r5',label:'Oitavas de Final',home:'Argentina',away:'Australia',status:'done',winner:'Argentina',homeScore:2,awayScore:1},
+    {id:'f_r6',label:'Oitavas de Final',home:'France',away:'Poland',status:'done',winner:'France',homeScore:3,awayScore:1},
+    {id:'f_r7',label:'Oitavas de Final',home:'Netherlands',away:'USA',status:'done',winner:'Netherlands',homeScore:3,awayScore:1},
+    {id:'f_r8',label:'Oitavas de Final',home:'Japan',away:'Croatia',status:'pending',winner:null},
+  ];
+
+  async function loadPickem() {
+    if (pickemLoaded) { renderPickemStats(); return; }
+    const el=document.getElementById('pickemGrid');
+    el.innerHTML='<div class="loading-state"><div class="spinner"></div> Carregando jogos...</div>';
+    const [r16,qf,sf,fin]=await Promise.all([
+      cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=LAST_16'),
+      cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=QUARTER_FINALS'),
+      cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=SEMI_FINALS'),
+      cachedFD('/competitions/'+WC_COMPETITION_ID+'/matches?stage=FINAL'),
+    ]);
+    pickemMatches = fin?.matches?.length ? buildPickemMatches(r16,qf,sf,fin) : FALLBACK_PICKEM;
+    if (currentUser) {
+      const {data}=await sb.from('picks').select('*').eq('user_id',currentUser.id);
+      if (data) data.forEach(p=>{ userPicks[p.match_id]=p.picked_team; });
+    }
+    pickemLoaded=true;
+    renderPickem();
+  }
+
+  function buildPickemMatches(r16d,qfd,sfd,find) {
+    const lm={'LAST_16':'Oitavas de Final','QUARTER_FINALS':'Quartas de Final','SEMI_FINALS':'Semifinal','FINAL':'Final'};
+    return [...(r16d?.matches||[]),...(qfd?.matches||[]),...(sfd?.matches||[]),...(find?.matches||[])].map(m=>{
+      const done=m.status==='FINISHED', live=m.status==='IN_PLAY'||m.status==='PAUSED';
+      const hs=m.score?.fullTime?.home, as=m.score?.fullTime?.away;
+      const pen=m.score?.penalties?.home>m.score?.penalties?.away?m.homeTeam?.name:m.score?.penalties?.away>m.score?.penalties?.home?m.awayTeam?.name:null;
+      return {id:String(m.id),label:lm[m.stage]||m.stage,home:m.homeTeam?.name||'TBD',away:m.awayTeam?.name||'TBD',
+        status:done?'done':live?'live':'pending',winner:done?(pen||(hs>as?m.homeTeam?.name:m.awayTeam?.name)):null,homeScore:hs,awayScore:as};
+    });
+  }
+
+  function renderPickem() {
+    renderPickemStats();
+    const el=document.getElementById('pickemGrid');
+    const order=['Final','Semifinal','Quartas de Final','Oitavas de Final'];
+    const grouped={};
+    pickemMatches.forEach(m=>{ if(!grouped[m.label])grouped[m.label]=[]; grouped[m.label].push(m); });
+    let html='';
+    order.forEach(phase=>{
+      if(!grouped[phase])return;
+      html+=`<div class="section-label" style="grid-column:1/-1">${phase}</div>`;
+      grouped[phase].forEach(m=>{ html+=renderPickCard(m); });
+    });
+    el.innerHTML=html;
+  }
+
+  function renderPickCard(m) {
+    const pick=userPicks[m.id];
+    const isDone=m.status==='done', isLive=m.status==='live';
+    const isCorrect=isDone&&pick&&pick===m.winner;
+    const isWrong=isDone&&pick&&pick!==m.winner;
+    let bc='badge-pending',bt='Aguardando';
+    if(isCorrect){bc='badge-correct';bt='✓ Acertou!';}
+    else if(isWrong){bc='badge-wrong';bt='✗ Errou';}
+    else if(isLive){bc='badge-live';bt='● Ao Vivo';}
+    else if(pick&&!isDone){bt='💾 Salvo';}
+    let resultHtml='';
+    if(isDone&&pick){
+      resultHtml=`<div class="pick-result-row"><span class="pick-result-label">Resultado real</span><span class="pick-result-neutral">${getFlag(m.winner)} ${m.winner}</span></div>
+      <div class="pick-result-row"><span class="pick-result-label">Seu palpite</span><span class="${isCorrect?'pick-result-correct':'pick-result-wrong'}">${getFlag(pick)} ${pick}</span></div>`;
+    } else if(isDone&&!pick){
+      resultHtml=`<div class="pick-result-row"><span class="pick-result-label">Resultado</span><span class="pick-result-neutral">${getFlag(m.winner)} ${m.winner}</span></div>
+      <div class="pick-result-row"><span class="pick-result-label">Palpite</span><span style="color:var(--text-3);font-style:italic">Não apostou</span></div>`;
+    }
+    const canPick=!isDone&&!isLive&&m.home!=='TBD';
+    let actionHtml='';
+    if(canPick&&!pick){
+      actionHtml=`<div class="pick-action"><select id="sel-${m.id}"><option value="">Escolha o vencedor</option>
+        <option value="${m.home}">${getFlag(m.home)} ${m.home}</option>
+        <option value="${m.away}">${getFlag(m.away)} ${m.away}</option></select>
+        <button class="btn-pick-save" onclick="savePick('${m.id}')">Salvar</button></div>`;
+    } else if(pick&&!isDone){
+      actionHtml=`<div class="pick-saved-pick">Palpite: ${getFlag(pick)} <strong>${pick}</strong></div>`;
+    } else if(m.home==='TBD'){
+      actionHtml=`<div class="pick-saved-pick" style="color:var(--text-3)">Aguardando definição dos times</div>`;
+    }
+    const scoreHtml=isDone&&m.homeScore!=null?`<span style="font-size:0.75rem;font-weight:700;color:var(--gold)">${m.homeScore} × ${m.awayScore}</span>`:'<span class="pick-vs">VS</span>';
+    return `<div class="pick-card${isCorrect?' correct':isWrong?' wrong':''}">
+      <div class="pick-card-header"><h4>${m.label}</h4><span class="badge ${bc}">${bt}</span></div>
+      <div class="pick-matchup">
+        <div class="pick-team-side"><span>${getFlag(m.home)}</span><span class="pick-team-name">${m.home}</span></div>
+        ${scoreHtml}
+        <div class="pick-team-side right"><span class="pick-team-name">${m.away}</span><span>${getFlag(m.away)}</span></div>
+      </div>
+      ${resultHtml}${actionHtml}
+    </div>`;
+  }
+
+  function renderPickemStats() {
+    let correct=0,wrong=0,pending=0;
+    pickemMatches.forEach(m=>{
+      const p=userPicks[m.id];
+      if(m.status==='done'){if(!p)pending++;else if(p===m.winner)correct++;else wrong++;}
+      else pending++;
+    });
+    document.getElementById('statPts').textContent=correct*10;
+    document.getElementById('statCorrect').textContent=correct;
+    document.getElementById('statWrong').textContent=wrong;
+    document.getElementById('statPending').textContent=pending;
+  }
+
+  async function savePick(matchId) {
+    const sel=document.getElementById('sel-'+matchId);
+    if(!sel||!sel.value){showToast('Escolha um vencedor primeiro!');return;}
+    const {error}=await sb.from('picks').upsert({user_id:currentUser.id,match_id:matchId,picked_team:sel.value,updated_at:new Date().toISOString()},{onConflict:'user_id,match_id'});
+    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    userPicks[matchId]=sel.value;
+    showToast('Palpite salvo: '+getFlag(sel.value)+' '+sel.value+' ✓');
+    await updateUserScore();
+    renderPickem();
+  }
+
+  async function saveAllPicks() {
+    const selects=document.querySelectorAll('[id^="sel-"]');
+    const upserts=[];
+    selects.forEach(sel=>{
+      if(!sel.value||userPicks[sel.id.replace('sel-','')]) return;
+      const mid=sel.id.replace('sel-','');
+      userPicks[mid]=sel.value;
+      upserts.push({user_id:currentUser.id,match_id:mid,picked_team:sel.value,updated_at:new Date().toISOString()});
+    });
+    if(!upserts.length){showToast('Sem palpites novos para salvar.');return;}
+    const {error}=await sb.from('picks').upsert(upserts,{onConflict:'user_id,match_id'});
+    if(error){showToast('Erro: '+error.message);return;}
+    await updateUserScore();
+    showToast(upserts.length+' palpite(s) salvo(s)! ✓');
+    renderPickem();
+  }
+
+  async function updateUserScore() {
+    let correct=0;
+    pickemMatches.forEach(m=>{ if(m.status==='done'&&userPicks[m.id]===m.winner)correct++; });
+    await sb.from('profiles').update({score:correct*10,correct_picks:correct}).eq('id',currentUser.id);
+  }
+
+  // ===== RANKING =====
+  async function loadRanking() {
+    const el=document.getElementById('rankingList');
+    el.innerHTML='<div class="loading-state"><div class="spinner"></div> Carregando ranking...</div>';
+    const {data,error}=await sb.from('profiles').select('id,name,email,score,correct_picks').order('score',{ascending:false}).limit(50);
+    if(error||!data?.length){renderRankingFallback(el);return;}
+    renderRankingData(el,data);
+  }
+
+  function renderRankingData(el,users) {
+    const medals=['🥇','🥈','🥉'];
+    let html='<div class="ranking-card">';
+    users.forEach((u,i)=>{
+      const isMe=currentUser&&u.id===currentUser.id;
+      html+=`<div class="ranking-row${isMe?' is-me':''}">
+        <div class="rank-pos">${medals[i]||i+1}</div>
+        <div class="rank-avatar">${initials(u.name||u.email||'?')}</div>
+        <div class="rank-info">
+          <div class="rank-name">${u.name||u.email?.split('@')[0]||'Usuário'}${isMe?'<span class="rank-you">Você</span>':''}</div>
+          <div class="rank-sub">${u.correct_picks||0} acerto(s)</div>
+        </div>
+        <div class="rank-pts">${u.score||0}<span class="rank-pts-label">pts</span></div>
+      </div>`;
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  }
+
+  function renderRankingFallback(el) {
+    const demo=[
+      {id:'1',name:'Pedro Alves',score:120,correct_picks:12},
+      {id:'2',name:'Maria Costa',score:100,correct_picks:10},
+      {id:'3',name:'João Silva',score:90,correct_picks:9},
+      {id:'4',name:'Lucas Mendes',score:80,correct_picks:8},
+      {id:'5',name:'Ana Ferreira',score:70,correct_picks:7},
+    ];
+    if(currentUser&&currentProfile){
+      const myScore=parseInt(document.getElementById('statPts')?.textContent||'0');
+      demo.splice(2,0,{id:currentUser.id,name:currentProfile.name||'Você',score:myScore,correct_picks:Math.floor(myScore/10)});
+      demo.sort((a,b)=>b.score-a.score);
+    }
+    renderRankingData(el,demo);
+  }
   </script>
 
-  <script src="js/app.js"></script>
-  <script src="js/brackets.js"></script>
-  <script src="js/pickem.js"></script>
-  <script src="js/ranking.js"></script>
 </body>
 </html>
