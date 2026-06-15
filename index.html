@@ -109,7 +109,7 @@
 
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onload="initApp()"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <script>
     const SUPABASE_URL = 'https://olzcsczypoaqpntzfbsv.supabase.co';
@@ -258,6 +258,15 @@
       };
       return map[msg] || msg;
     }
+
+    // Inicia depois que a página toda carregou
+    window.addEventListener('DOMContentLoaded', function() {
+      if (window.supabase) {
+        initApp();
+      } else {
+        document.querySelector('script[src*="supabase"]').addEventListener('load', initApp);
+      }
+    });
   </script>
 </body>
 </html>
