@@ -115,12 +115,23 @@
     </div>
   </div>
 
-  <!-- TOAST -->
+<!-- TOAST -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
+  <script>
+    window.addEventListener('load', function() {
+      var s1 = document.createElement('script');
+      s1.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s1.onload = function() {
+        var s2 = document.createElement('script'); s2.src = 'js/config.js';
+        s2.onload = function() {
+          var s3 = document.createElement('script'); s3.src = 'js/auth.js';
+          document.body.appendChild(s3);
+        };
+        document.body.appendChild(s2);
+      };
+      document.body.appendChild(s1);
+    });
+  </script>
 </body>
 </html>
