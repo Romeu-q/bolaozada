@@ -134,12 +134,84 @@
 
   </main>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+ <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js"></script>
+
+  <script>
+    // Config inline — sem depender de config.js externo
+    const SUPABASE_URL = 'https://olzcsczypoaqpntzfbsv.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_GD9R_nDQNxlZY5F0lNaCnw_CUAKm6eX';
+    const FD_BASE = 'https://api.football-data.org/v4';
+    const FD_TOKEN = '06f91a53d7ff4718a498803703571a46';
+    const WC_COMPETITION_ID = 2000;
+
+    let supabase;
+    let currentUser = null;
+    let currentProfile = null;
+
+    const _cache = {};
+    async function cachedFD(path, ttlMs = 5 * 60 * 1000) {
+      const key = 'fd:' + path;
+      const now = Date.now();
+      if (_cache[key] && now - _cache[key].ts < ttlMs) return _cache[key].data;
+      const data = await apiFD(path);
+      if (data) _cache[key] = { data, ts: now };
+      return data;
+    }
+
+    async function apiFD(path) {
+      try {
+        const res = await fetch(FD_BASE + path, { headers: { 'X-Auth-Token': FD_TOKEN } });
+        if (!res.ok) return null;
+        return res.json();
+      } catch(e) { return null; }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    function initials(name) {
+      if (!name) return '??';
+      const p = name.trim().split(' ');
+      return p.length === 1 ? p[0].slice(0,2).toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
+    }
+
+    const FLAGS = {
+      'Brazil':'🇧🇷','Germany':'🇩🇪','France':'🇫🇷','Argentina':'🇦🇷','Spain':'🇪🇸',
+      'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪',
+      'Italy':'🇮🇹','Uruguay':'🇺🇾','Mexico':'🇲🇽','United States':'🇺🇸','USA':'🇺🇸',
+      'Canada':'🇨🇦','Japan':'🇯🇵','South Korea':'🇰🇷','Korea Republic':'🇰🇷',
+      'Australia':'🇦🇺','Morocco':'🇲🇦','Senegal':'🇸🇳','Ghana':'🇬🇭',
+      'Ecuador':'🇪🇨','Croatia':'🇭🇷','Switzerland':'🇨🇭','Poland':'🇵🇱',
+      'Denmark':'🇩🇰','Serbia':'🇷🇸','Colombia':'🇨🇴','Saudi Arabia':'🇸🇦',
+      'Iran':'🇮🇷','Cameroon':'🇨🇲','Tunisia':'🇹🇳','Qatar':'🇶🇦','Wales':'🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+      'Costa Rica':'🇨🇷','Ghana':'🇬🇦'
+    };
+    function getFlag(name) { return FLAGS[name] || '🏳️'; }
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { window.location.href = 'index.html'; return; }
+
+      currentUser = session.user;
+      await loadProfile();
+      initDarkMode();
+      initUserMenu();
+      loadBrackets();
+    });
+
+    supabase = null; // será inicializado no DOMContentLoaded
+  </script>
+
   <script src="js/app.js"></script>
   <script src="js/brackets.js"></script>
   <script src="js/pickem.js"></script>
