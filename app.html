@@ -582,9 +582,9 @@
       const gId=g.group?.replace('GROUP_','')||'?';
       const realOrder=(g.table||[]).map(t=>t.team?.name);
       // Use pick order if exists, else use current API order
-      const pickOrder=groupPicks[gId]?.[...groupPicks[gId]]:[...realOrder];
+      const pickOrder=groupPicks[gId]?groupPicks[gId].slice():[].concat(realOrder);
       // Ensure all teams are in pickOrder
-      realOrder.forEach(t=>{if(!pickOrder.includes(t))pickOrder.push(t);});
+      realOrder.forEach(function(t){if(pickOrder.indexOf(t)===-1)pickOrder.push(t);});
 
       const groupDone=g.table?.every(t=>t.playedGames>=3);
       let statusText=groupDone?'Encerrado':'Em andamento';
@@ -641,16 +641,16 @@
     if(!dragSrc||dragSrc===target)return;
     if(dragSrc.dataset.group!==target.dataset.group)return;
     const list=target.parentNode;
-    const items=[...list.children];
+    const items=Array.from(list.children);
     const srcIdx=items.indexOf(dragSrc);
     const tgtIdx=items.indexOf(target);
     if(srcIdx<tgtIdx)list.insertBefore(dragSrc,target.nextSibling);
     else list.insertBefore(dragSrc,target);
     // Update pick state
     const gId=dragSrc.dataset.group;
-    groupPicks[gId]=[...list.children].map(li=>li.dataset.team);
+    groupPicks[gId]=Array.from(list.children).map(function(li){return li.dataset.team;});
     // Re-render position numbers
-    [...list.children].forEach((li,i)=>{
+    Array.from(list.children).forEach(function(li,i){
       const pos=li.querySelector('.pick-pos');
       pos.className='pick-pos '+(['p1','p2','p3','p4'][i]||'p4');
       pos.textContent=i+1;
