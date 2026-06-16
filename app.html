@@ -294,7 +294,7 @@
     else{body.classList.add('open');chev.classList.add('open');}
   }
 
-  function startLiveScores(){fetchLiveScores();setInterval(fetchLiveScores,60000);}
+  function startLiveScores(){fetchLiveScores();setInterval(fetchLiveScores,30000);}
   function fetchLiveScores(){
     var today=new Date().toISOString().split('T')[0];
     apiFD('competitions/'+WC+'/matches?dateFrom='+today+'&dateTo='+today).then(function(data){
@@ -389,16 +389,16 @@
   // ===== PICK'EM =====
   function loadPickem(){
     if(pickemLoaded){renderKOPicks();calcScore();return;}
-    var p1=(!realGroups.length||!allMatches.length)?Promise.all([cachedFD('competitions/'+WC+'/standings'),cachedFD('competitions/'+WC+'/matches')]).then(function(res){
+    Promise.all([
+      cachedFD('competitions/'+WC+'/standings'),
+      cachedFD('competitions/'+WC+'/matches'),
+      sb.from('user_picks').select('*').eq('user_id',currentUser.id).single()
+    ]).then(function(res){
       if(res[0]&&res[0].standings)realGroups=res[0].standings;
       if(res[1]&&res[1].matches)allMatches=res[1].matches;
-    }):Promise.resolve();
-    p1.then(function(){
-      return sb.from('user_picks').select('*').eq('user_id',currentUser.id).single();
-    }).then(function(res2){
-      if(res2&&res2.data){
-        if(res2.data.group_picks)groupPicks=res2.data.group_picks;
-        if(res2.data.ko_picks)koPicks=res2.data.ko_picks;
+      if(res[2]&&res[2].data){
+        if(res[2].data.group_picks)groupPicks=res[2].data.group_picks;
+        if(res[2].data.ko_picks)koPicks=res[2].data.ko_picks;
       }
       pickemLoaded=true;
       renderGroupPicks();
