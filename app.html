@@ -296,28 +296,54 @@
 
   function startLiveScores(){fetchLiveScores();setInterval(fetchLiveScores,30000);}
   function fetchLiveScores(){
-    var today=new Date().toISOString().split('T')[0];
-    apiFD('competitions/'+WC+'/matches?dateFrom='+today+'&dateTo='+today).then(function(data){
+    fetch('/api/live?path=football-get-all-live-scores-of-matches').then(function(r){return r.json();}).then(function(data){
       var bar=document.getElementById('liveBar');
       var container=document.getElementById('liveScoreBar');
-      if(!data||!data.matches||!data.matches.length){bar.style.display='none';return;}
+      var matches=data&&data.response||[];
+      if(!matches.length){
+        // fallback: busca jogos de hoje pela fd.org
+        var today=new Date().toISOString().split('T')[0];
+        apiFD('competitions/'+WC+'/matches?dateFrom='+today+'&dateTo='+today).then(function(d){
+          if(!d||!d.matches||!d.matches.length){bar.style.display='none';return;}
+          bar.style.display='block';
+          renderLiveBar(container,d.matches.map(function(m){
+            return {home:m.homeTeam&&m.homeTeam.shortName||'?',away:m.awayTeam&&m.awayTeam.shortName||'?',
+              hFlag:f(m.homeTeam&&m.homeTeam.name),aFlag:f(m.awayTeam&&m.awayTeam.name),
+              hs:m.score&&m.score.fullTime?m.score.fullTime.home:null,
+              as:m.score&&m.score.fullTime?m.score.fullTime.away:null,
+              live:m.status==='IN_PLAY'||m.status==='PAUSED',
+              done:m.status==='FINISHED',minute:m.minute,
+              group:m.group?m.group.replace('GROUP_',''):''};
+          }));
+        });
+        return;
+      }
       bar.style.display='block';
+      renderLiveBar(container,matches.map(function(m){
+        var f1=m.homeTeam&&m.homeTeam.name||'';
+        var f2=m.awayTeam&&m.awayTeam.name||'';
+        var live=m.status==='LIVE'||m.status==='1H'||m.status==='2H'||m.status==='HT'||m.status==='ET'||m.status==='P';
+        return {home:m.homeTeam&&m.homeTeam.name||'?',away:m.awayTeam&&m.awayTeam.name||'?',
+          hFlag:f(f1),aFlag:f(f2),
+          hs:m.goals&&m.goals.home!=null?m.goals.home:null,
+          as:m.goals&&m.goals.away!=null?m.goals.away:null,
+          live:live,done:m.status==='FT'||m.status==='AET'||m.status==='PEN',
+          minute:m.fixture&&m.fixture.status&&m.fixture.status.elapsed,
+          group:m.league&&m.league.round||''};
+      }));
       var now=new Date();
       document.getElementById('lastRefresh').textContent='Atualizado às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      var sorted=data.matches.sort(function(a,b){var o={IN_PLAY:0,PAUSED:1,FINISHED:2,TIMED:3,SCHEDULED:4};return (o[a.status]||5)-(o[b.status]||5);});
-      container.innerHTML=sorted.map(function(m){
-        var live=m.status==='IN_PLAY'||m.status==='PAUSED';
-        var done=m.status==='FINISHED';
-        var hs=m.score&&m.score.fullTime&&m.score.fullTime.home!=null?m.score.fullTime.home:(m.score&&m.score.halfTime?m.score.halfTime.home:null);
-        var as=m.score&&m.score.fullTime&&m.score.fullTime.away!=null?m.score.fullTime.away:(m.score&&m.score.halfTime?m.score.halfTime.away:null);
-        var showScore=live||done;
-        var dotClass=live?'dot-live':done?'dot-finished':'dot-scheduled';
-        var time=live?(m.minute?m.minute+"'":'▶'):done?'FT':new Date(m.utcDate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-        var hShort=m.homeTeam&&(m.homeTeam.shortName||m.homeTeam.name)||'?';
-        var aShort=m.awayTeam&&(m.awayTeam.shortName||m.awayTeam.name)||'?';
-        return '<div class="live-card '+(live?'is-live':'')+'"><div class="live-dot-r '+dotClass+'"></div><div class="live-teams"><div class="live-team-row"><span class="live-team-name">'+f(m.homeTeam&&m.homeTeam.name)+' '+hShort+'</span>'+(showScore?'<span class="live-team-score">'+(hs||0)+'</span>':'')+'</div><div class="live-team-row"><span class="live-team-name">'+f(m.awayTeam&&m.awayTeam.name)+' '+aShort+'</span>'+(showScore?'<span class="live-team-score">'+(as||0)+'</span>':'')+'</div><div class="live-meta">'+(live?'<span class="live-badge">AO VIVO '+time+'</span>':time)+' · '+(m.group?m.group.replace('GROUP_',''):m.stage||'')+'</div></div></div>';
-      }).join('');
-    });
+    }).catch(function(){});
+  }
+
+  function renderLiveBar(container,matches){
+    if(!matches||!matches.length){document.getElementById('liveBar').style.display='none';return;}
+    var sorted=matches.sort(function(a,b){return (a.live?0:a.done?1:2)-(b.live?0:b.done?1:2);});
+    container.innerHTML=sorted.map(function(m){
+      var dotClass=m.live?'dot-live':m.done?'dot-finished':'dot-scheduled';
+      var time=m.live?(m.minute?m.minute+"'":'▶'):m.done?'FT':'';
+      return '<div class="live-card '+(m.live?'is-live':'')+'"><div class="live-dot-r '+dotClass+'"></div><div class="live-teams"><div class="live-team-row"><span class="live-team-name">'+m.hFlag+' '+m.home+'</span>'+(m.hs!=null?'<span class="live-team-score">'+m.hs+'</span>':'')+'</div><div class="live-team-row"><span class="live-team-name">'+m.aFlag+' '+m.away+'</span>'+(m.as!=null?'<span class="live-team-score">'+m.as+'</span>':'')+'</div><div class="live-meta">'+(m.live?'<span class="live-badge">AO VIVO '+time+'</span>':time)+(m.group?' · '+m.group:'')+'</div></div></div>';
+    }).join('');
   }
 
   function loadBrackets(){
