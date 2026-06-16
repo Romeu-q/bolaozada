@@ -710,7 +710,7 @@
             +'</div>'
             +'<div class="pick-ko-select">'
             +'<input type="text" placeholder="Time que vai passar..." value="'+(pick||'')+'" '
-            +'oninput="setKOPick(''+matchKey+'',this.value)" '
+            +'oninput="setKOPick(this.dataset.key,this.value)" data-key="'+matchKey+'" '
             +'style="padding:6px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.8rem;font-family:inherit;outline:none;width:200px;">'
             +'</div>'
             +'</div>'
