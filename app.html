@@ -9,181 +9,144 @@
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/app.css">
   <style>
-    /* ===== LIVE SCORE OVERRIDES ===== */
-    .live-badge {
-      display:inline-flex;align-items:center;gap:4px;
-      background:rgba(239,68,68,0.15);color:#ef4444;
-      font-size:0.65rem;font-weight:800;padding:2px 7px;
-      border-radius:99px;text-transform:uppercase;letter-spacing:0.5px;
-    }
-    .live-badge::before {
-      content:'';width:5px;height:5px;border-radius:50%;
-      background:#ef4444;animation:livePulse 1s infinite;
-    }
-    .live-score-bar {
-      background:var(--bg-2);border-bottom:1px solid var(--border);
-      padding:8px 1.25rem;display:flex;gap:8px;overflow-x:auto;
-      scrollbar-width:none;
-    }
+    /* LIVE BAR */
+    .live-score-bar{background:var(--bg-2);border-bottom:1px solid var(--border);padding:8px 1.25rem;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
     .live-score-bar::-webkit-scrollbar{display:none}
-    .live-card {
-      flex-shrink:0;background:var(--card);border:1px solid var(--border);
-      border-radius:var(--radius-sm);padding:8px 12px;min-width:180px;
-      display:flex;align-items:center;gap:8px;font-size:0.78rem;
-      cursor:pointer;transition:border-color 0.2s;
-    }
-    .live-card.is-live{border-color:#ef4444;}
-    .live-card.is-live:hover{border-color:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.15);}
-    .live-card:not(.is-live){border-color:var(--gold-border);}
+    .live-card{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;min-width:175px;display:flex;align-items:center;gap:8px;font-size:0.78rem;}
+    .live-card.is-live{border-color:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.15);}
     .live-teams{flex:1;display:flex;flex-direction:column;gap:3px;}
     .live-team-row{display:flex;align-items:center;justify-content:space-between;gap:6px;}
-    .live-team-name{font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;}
+    .live-team-name{font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;}
     .live-team-score{font-weight:800;font-size:0.9rem;color:var(--gold);min-width:16px;text-align:right;}
     .live-meta{font-size:0.65rem;color:var(--text-3);white-space:nowrap;margin-top:2px;}
-    .live-status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    .live-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(239,68,68,0.15);color:#ef4444;font-size:0.62rem;font-weight:800;padding:2px 6px;border-radius:99px;text-transform:uppercase;}
+    .live-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#ef4444;animation:livePulse 1s infinite;}
+    .live-dot-r{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
     .dot-live{background:#ef4444;animation:livePulse 1s infinite;}
     .dot-finished{background:var(--green);}
     .dot-scheduled{background:var(--text-3);}
-    .refresh-info{
-      display:flex;align-items:center;gap:6px;font-size:0.72rem;
-      color:var(--text-3);padding:0 1.25rem 6px;
-    }
-    .refresh-btn{
-      background:none;border:none;color:var(--gold);font-size:0.72rem;
-      cursor:pointer;padding:0;font-family:inherit;
-    }
-    .refresh-btn:hover{text-decoration:underline;}
+    .refresh-info{display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text-3);padding:4px 1.25rem 6px;}
+    .refresh-btn{background:none;border:none;color:var(--gold);font-size:0.72rem;cursor:pointer;padding:0;font-family:inherit;}
 
-    /* ===== KNOCKOUT TREE ===== */
-    .ko-wrapper-outer{overflow-x:auto;padding-bottom:1.5rem;}
-    .ko-tree{
-      display:flex;align-items:stretch;
-      gap:0;min-width:1100px;
-    }
-    .ko-col{
-      display:flex;flex-direction:column;
-      border-right:1px solid var(--border-2);
-    }
-    .ko-col:last-child{border-right:none;}
-    .ko-col-head{
-      text-align:center;font-size:0.65rem;font-weight:800;
-      text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);
-      padding:10px 6px 8px;border-bottom:1px solid var(--border);
-      background:var(--bg-3);white-space:nowrap;
-    }
-    .ko-col-matches{
-      display:flex;flex-direction:column;
-      justify-content:space-around;flex:1;
-      padding:6px 4px;gap:4px;
-    }
-    .ko-match-card{
-      background:var(--card);border:1px solid var(--border);
-      border-radius:6px;overflow:hidden;
-      transition:border-color 0.2s,box-shadow 0.2s;
-      min-width:140px;
-    }
-    .ko-match-card:hover{border-color:var(--gold-border);}
-    .ko-match-card.is-live{border-color:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.15);}
-    .ko-match-card.final-card{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,0.2);}
-    .ko-row{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:5px 8px;font-size:0.73rem;font-weight:500;
-      min-height:28px;gap:4px;
-    }
-    .ko-row:first-child{border-bottom:1px solid var(--border-2);}
-    .ko-row.winner{background:rgba(212,175,55,0.1);font-weight:700;}
-    .ko-row.loser{opacity:0.4;}
-    .ko-row-left{display:flex;align-items:center;gap:5px;overflow:hidden;}
-    .ko-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;}
-    .ko-sc{
-      font-weight:800;font-size:0.8rem;color:var(--gold);
-      flex-shrink:0;min-width:14px;text-align:right;
-    }
-    .ko-pen-badge{
-      font-size:0.55rem;background:var(--gold);color:#0D0D1A;
-      border-radius:3px;padding:1px 3px;font-weight:800;
-      flex-shrink:0;
-    }
-    .ko-tbd{color:var(--text-3);font-style:italic;}
-
-    /* Champion box */
-    .champion-col{
-      display:flex;flex-direction:column;align-items:stretch;
-      min-width:130px;border-right:none!important;
-    }
-    .champion-inner{
-      flex:1;display:flex;align-items:center;justify-content:center;
-      padding:12px 8px;
-    }
-    .champion-box{
-      background:var(--card);border:2px solid var(--gold);
-      border-radius:var(--radius);padding:1.25rem 1rem;
-      text-align:center;width:100%;
-      box-shadow:0 0 32px rgba(212,175,55,0.25);
-    }
-    .champion-trophy{font-size:2.2rem;display:block;margin-bottom:6px;}
-    .champion-label{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gold);}
-    .champion-name{font-size:0.9rem;font-weight:800;color:var(--text);margin-top:5px;}
-
-    /* Groups grid 2026 — 12 groups */
-    .groups-grid-2026{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:0.85rem;
-    }
-    .group-card{border-radius:var(--radius);overflow:hidden;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
-    .group-head{
-      background:var(--gold);color:#0D0D1A;
-      padding:8px 12px;display:flex;align-items:center;justify-content:space-between;
-    }
-    .group-head h3{font-size:0.85rem;font-weight:800;}
-    .group-head span{font-size:0.68rem;opacity:0.65;}
-    .group-table{width:100%;border-collapse:collapse;}
-    .group-table th{
-      font-size:0.63rem;font-weight:700;text-transform:uppercase;
-      letter-spacing:0.5px;color:var(--text-3);padding:5px 12px 4px;
-      text-align:left;border-bottom:1px solid var(--border-2);
-    }
-    .group-table th:not(:first-child){text-align:center;}
-    .group-table td{
-      padding:6px 12px;font-size:0.78rem;
-      border-bottom:1px solid var(--border-2);color:var(--text);
-    }
-    .group-table td:not(:first-child){text-align:center;color:var(--text-2);font-size:0.75rem;}
-    .group-table tr:last-child td{border-bottom:none;}
-    .team-cell{display:flex;align-items:center;gap:6px;}
-    .q-dot{width:4px;height:4px;border-radius:50%;background:var(--green);flex-shrink:0;}
-    .e-dot{width:4px;height:4px;border-radius:50%;background:transparent;flex-shrink:0;}
-    .t3-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0;}
-
-    /* Tabs inside brackets */
+    /* BRACKET TABS */
     .bracket-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
-    .bracket-tab{
-      padding:6px 14px;background:var(--bg-3);border:1px solid var(--border);
-      border-radius:var(--radius-full);font-size:0.78rem;font-weight:600;
-      color:var(--text-2);cursor:pointer;transition:all 0.2s;
-    }
+    .bracket-tab{padding:6px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.78rem;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.2s;}
     .bracket-tab.active{background:var(--gold);color:#0D0D1A;border-color:var(--gold);}
     .bracket-section{display:none;}
     .bracket-section.active{display:block;}
 
-    /* Countdown */
-    .countdown-bar{
-      background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.03));
-      border:1px solid var(--gold-border);border-radius:var(--radius);
-      padding:12px 16px;margin-bottom:1.25rem;
-      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    /* GROUPS */
+    .groups-grid-2026{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.85rem;}
+    .group-card{border-radius:var(--radius);overflow:hidden;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+    .group-head{background:var(--gold);color:#0D0D1A;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;}
+    .group-head h3{font-size:0.85rem;font-weight:800;}
+    .group-head span{font-size:0.68rem;opacity:0.65;}
+    .group-table{width:100%;border-collapse:collapse;}
+    .group-table th{font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);padding:5px 12px 4px;text-align:left;border-bottom:1px solid var(--border-2);}
+    .group-table th:not(:first-child){text-align:center;}
+    .group-table td{padding:6px 12px;font-size:0.78rem;border-bottom:1px solid var(--border-2);color:var(--text);}
+    .group-table td:not(:first-child){text-align:center;color:var(--text-2);font-size:0.75rem;}
+    .group-table tr:last-child td{border-bottom:none;}
+    .team-cell{display:flex;align-items:center;gap:6px;}
+    .q-dot{width:4px;height:4px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    .t3-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+    .e-dot{width:4px;height:4px;border-radius:50%;background:transparent;flex-shrink:0;}
+
+    /* KNOCKOUT TREE */
+    .ko-wrapper-outer{overflow-x:auto;padding-bottom:1.5rem;}
+    .ko-tree{display:flex;align-items:stretch;min-width:1100px;}
+    .ko-col{display:flex;flex-direction:column;border-right:1px solid var(--border-2);flex:1;}
+    .ko-col:last-child{border-right:none;}
+    .ko-col-head{text-align:center;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);padding:10px 6px 8px;border-bottom:1px solid var(--border);background:var(--bg-3);white-space:nowrap;}
+    .ko-col-matches{display:flex;flex-direction:column;justify-content:space-around;flex:1;padding:6px 4px;gap:4px;}
+    .ko-match-card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color 0.2s;min-width:130px;}
+    .ko-match-card.is-live{border-color:#ef4444;}
+    .ko-match-card.final-card{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,0.2);}
+    .ko-row{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;font-size:0.72rem;font-weight:500;min-height:28px;gap:4px;}
+    .ko-row:first-child{border-bottom:1px solid var(--border-2);}
+    .ko-row.winner{background:rgba(212,175,55,0.1);font-weight:700;}
+    .ko-row.loser{opacity:0.4;}
+    .ko-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:95px;}
+    .ko-sc{font-weight:800;font-size:0.8rem;color:var(--gold);flex-shrink:0;}
+    .ko-pen{font-size:0.55rem;background:var(--gold);color:#0D0D1A;border-radius:3px;padding:1px 3px;font-weight:800;}
+    .ko-tbd{color:var(--text-3);font-style:italic;}
+    .champion-col{display:flex;flex-direction:column;min-width:130px;}
+    .champion-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 8px;}
+    .champion-box{background:var(--card);border:2px solid var(--gold);border-radius:var(--radius);padding:1.25rem 1rem;text-align:center;width:100%;box-shadow:0 0 32px rgba(212,175,55,0.25);}
+    .champion-trophy{font-size:2.2rem;display:block;margin-bottom:6px;}
+    .champion-label{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gold);}
+    .champion-name{font-size:0.9rem;font-weight:800;color:var(--text);margin-top:5px;}
+
+    /* ===== PICK'EM NOVO ===== */
+    .pickem-tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
+    .pickem-tab{padding:7px 16px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.8rem;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.2s;}
+    .pickem-tab.active{background:var(--gold);color:#0D0D1A;border-color:var(--gold);}
+    .pickem-section{display:none;}
+    .pickem-section.active{display:block;}
+
+    /* Group pick — drag to reorder */
+    .pick-groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
+    .pick-group-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);}
+    .pick-group-head{background:var(--gold);color:#0D0D1A;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;}
+    .pick-group-head h4{font-size:0.85rem;font-weight:800;}
+    .pick-group-status{font-size:0.68rem;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,0.15);font-weight:700;}
+    .pick-team-list{list-style:none;padding:6px 0;}
+    .pick-team-item{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 14px;border-bottom:1px solid var(--border-2);
+      cursor:grab;user-select:none;transition:background 0.15s;
     }
-    .countdown-left{font-size:0.8rem;color:var(--text-2);}
-    .countdown-left strong{color:var(--gold);}
-    .countdown-nums{display:flex;gap:8px;}
-    .countdown-unit{text-align:center;}
-    .countdown-num{font-size:1.3rem;font-weight:900;color:var(--gold);line-height:1;}
-    .countdown-lbl{font-size:0.58rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;}
+    .pick-team-item:last-child{border-bottom:none;}
+    .pick-team-item:active{cursor:grabbing;}
+    .pick-team-item.dragging{opacity:0.4;background:var(--bg-3);}
+    .pick-team-item.drag-over{background:var(--gold-bg);border-color:var(--gold);}
+    .pick-pos{
+      width:22px;height:22px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.72rem;font-weight:800;flex-shrink:0;
+    }
+    .pick-pos.p1{background:var(--green);color:#fff;}
+    .pick-pos.p2{background:rgba(34,197,94,0.3);color:var(--green);}
+    .pick-pos.p3{background:var(--gold-bg);color:var(--gold);}
+    .pick-pos.p4{background:var(--bg-3);color:var(--text-3);}
+    .pick-team-name{flex:1;font-size:0.85rem;font-weight:500;color:var(--text);}
+    .drag-handle{color:var(--text-3);font-size:0.9rem;flex-shrink:0;}
+
+    /* Result overlay on group pick */
+    .pick-team-item.correct-pos{background:rgba(22,163,74,0.08);}
+    .pick-team-item.wrong-pos{background:rgba(220,38,38,0.05);}
+    .pick-result-badge{font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:99px;flex-shrink:0;}
+    .pick-result-badge.correct{background:var(--green-bg);color:var(--green);}
+    .pick-result-badge.partial{background:var(--gold-bg);color:var(--gold);}
+    .pick-result-badge.wrong{background:var(--red-bg);color:var(--red);}
+
+    /* KO pick */
+    .pick-ko-grid{display:flex;flex-direction:column;gap:1rem;}
+    .pick-ko-phase{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);}
+    .pick-ko-phase-head{background:var(--bg-3);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+    .pick-ko-phase-head h4{font-size:0.85rem;font-weight:700;color:var(--text);}
+    .pick-ko-matches{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;}
+    .pick-ko-match{padding:12px 14px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .pick-ko-match:last-child{border-bottom:none;}
+    .pick-ko-vs{display:flex;align-items:center;gap:8px;flex:1;min-width:200px;}
+    .pick-ko-team{font-size:0.83rem;font-weight:500;color:var(--text);}
+    .pick-ko-sep{font-size:0.7rem;color:var(--text-3);font-weight:700;}
+    .pick-ko-select{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+    .pick-ko-select select{padding:6px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.8rem;font-family:inherit;outline:none;cursor:pointer;min-width:160px;}
+    .pick-ko-select select:focus{border-color:var(--gold);}
+    .pick-ko-result{display:flex;align-items:center;gap:6px;font-size:0.78rem;margin-top:4px;width:100%;}
+
+    /* Points breakdown */
+    .pts-breakdown{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
+    .pts-card{flex:1;min-width:90px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;box-shadow:var(--shadow-sm);}
+    .pts-val{font-size:1.6rem;font-weight:900;line-height:1;}
+    .pts-lbl{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);margin-top:4px;font-weight:600;}
 
     @media(max-width:640px){
       .groups-grid-2026{grid-template-columns:1fr;}
       .ko-tree{min-width:800px;}
+      .pick-groups-grid{grid-template-columns:1fr;}
+      .pick-ko-matches{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -196,8 +159,7 @@
     </div>
     <div class="topbar-actions">
       <button class="btn-dark-toggle" onclick="toggleDarkMode()">
-        <span id="darkIcon">🌙</span>
-        <span id="darkLabel">Escuro</span>
+        <span id="darkIcon">🌙</span><span id="darkLabel">Escuro</span>
       </button>
       <div class="user-menu">
         <div class="user-avatar" id="userAvatar">--</div>
@@ -213,12 +175,12 @@
     </div>
   </header>
 
-  <!-- LIVE SCORE BAR -->
+  <!-- LIVE BAR -->
   <div id="liveBar" style="display:none">
     <div class="live-score-bar" id="liveScoreBar"></div>
     <div class="refresh-info">
       <span id="lastRefresh">Atualizando...</span>
-      <button class="refresh-btn" onclick="fetchLiveScores()">↻ Atualizar agora</button>
+      <button class="refresh-btn" onclick="fetchLiveScores()">↻ Atualizar</button>
     </div>
   </div>
 
@@ -236,41 +198,60 @@
         <h2>Copa do Mundo <span class="gold">2026</span></h2>
         <div class="live-pill"><span class="live-dot"></span>Tempo real</div>
       </div>
-
       <div class="bracket-tabs">
         <button class="bracket-tab active" onclick="switchBracketTab('groups',this)">📊 Grupos</button>
         <button class="bracket-tab" onclick="switchBracketTab('knockout',this)">🏆 Mata-Mata</button>
       </div>
-
       <div class="bracket-section active" id="bs-groups">
         <div id="groupsGrid" class="groups-grid-2026">
           <div class="loading-state"><div class="spinner"></div> Carregando grupos...</div>
         </div>
       </div>
-
       <div class="bracket-section" id="bs-knockout">
         <div class="ko-wrapper-outer">
-          <div id="knockoutTree">
-            <div class="loading-state"><div class="spinner"></div> Carregando mata-mata...</div>
-          </div>
+          <div id="knockoutTree"><div class="loading-state"><div class="spinner"></div> Carregando mata-mata...</div></div>
         </div>
       </div>
     </section>
 
-    <!-- PICKEM -->
+    <!-- PICK'EM -->
     <section class="page" id="page-pickem">
       <div class="page-header">
         <h2>🎯 Meus Palpites</h2>
         <button class="btn-save-all" onclick="saveAllPicks()">💾 Salvar tudo</button>
       </div>
-      <div class="score-banner">
-        <div class="score-stat"><div class="score-val gold" id="statPts">0</div><div class="score-lbl">Pontos</div></div>
-        <div class="score-stat"><div class="score-val green" id="statCorrect">0</div><div class="score-lbl">Acertos</div></div>
-        <div class="score-stat"><div class="score-val red" id="statWrong">0</div><div class="score-lbl">Erros</div></div>
-        <div class="score-stat"><div class="score-val muted" id="statPending">0</div><div class="score-lbl">Pendentes</div></div>
+
+      <!-- PONTUAÇÃO -->
+      <div class="pts-breakdown">
+        <div class="pts-card"><div class="pts-val gold" id="statTotal">0</div><div class="pts-lbl">Total pts</div></div>
+        <div class="pts-card"><div class="pts-val green" id="statGroup">0</div><div class="pts-lbl">Grupos</div></div>
+        <div class="pts-card"><div class="pts-val" style="color:var(--blue)" id="statKO">0</div><div class="pts-lbl">Mata-mata</div></div>
+        <div class="pts-card"><div class="pts-val gold" id="statChamp">0</div><div class="pts-lbl">Campeão</div></div>
       </div>
-      <div id="pickemGrid" class="pickem-grid">
-        <div class="loading-state"><div class="spinner"></div> Carregando jogos...</div>
+
+      <div class="pickem-tabs">
+        <button class="pickem-tab active" onclick="switchPickemTab('groups',this)">📊 Fase de Grupos</button>
+        <button class="pickem-tab" onclick="switchPickemTab('knockout',this)">🏆 Mata-Mata</button>
+      </div>
+
+      <!-- GRUPOS PICK -->
+      <div class="pickem-section active" id="ps-groups">
+        <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:1rem">
+          🖱️ Arraste os times para definir a ordem final de cada grupo. <strong style="color:var(--gold)">1º e 2º passam, 3º pode passar como melhor terceiro.</strong>
+        </p>
+        <div id="pickGroupsGrid" class="pick-groups-grid">
+          <div class="loading-state"><div class="spinner"></div> Carregando grupos...</div>
+        </div>
+      </div>
+
+      <!-- KO PICK -->
+      <div class="pickem-section" id="ps-knockout">
+        <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:1rem">
+          🏆 Escolha o vencedor de cada confronto do mata-mata. Você pode palpitar antes dos times serem definidos!
+        </p>
+        <div id="pickKOGrid" class="pick-ko-grid">
+          <div class="loading-state"><div class="spinner"></div> Carregando...</div>
+        </div>
       </div>
     </section>
 
@@ -280,9 +261,7 @@
         <h2>🏅 Ranking Geral</h2>
         <button class="btn-outline-sm" onclick="loadRanking()">↻ Atualizar</button>
       </div>
-      <div id="rankingList">
-        <div class="loading-state"><div class="spinner"></div> Carregando ranking...</div>
-      </div>
+      <div id="rankingList"><div class="loading-state"><div class="spinner"></div> Carregando...</div></div>
     </section>
 
   </main>
@@ -296,14 +275,19 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_GD9R_nDQNxlZY5F0lNaCnw_CUAKm6eX';
   const WC = 'WC';
   let sb, currentUser, currentProfile;
-  let pickemMatches = [], userPicks = {}, pickemLoaded = false;
-  let liveInterval = null;
   const _cache = {};
+
+  // Pick state
+  let groupPicks = {};   // { 'A': ['Brazil','Serbia','Switzerland','Cameroon'], ... }
+  let koPicks = {};      // { 'R32_1': 'Brazil', ... }
+  let realGroups = [];   // from API
+  let allMatches = [];
+  let pickemLoaded = false;
 
   const FLAGS = {
     'Brazil':'🇧🇷','Germany':'🇩🇪','France':'🇫🇷','Argentina':'🇦🇷','Spain':'🇪🇸',
     'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Portugal':'🇵🇹','Netherlands':'🇳🇱','Belgium':'🇧🇪',
-    'Italy':'🇮🇹','Uruguay':'🇺🇾','Mexico':'🇲🇽','United States':'🇺🇸','USA':'🇺🇸',
+    'Italy':'🇮🇹','Uruguay':'🇺🇾','Mexico':'🇲🇽','United States':'🇺🇸',
     'Canada':'🇨🇦','Japan':'🇯🇵','South Korea':'🇰🇷','Korea Republic':'🇰🇷',
     'Australia':'🇦🇺','Morocco':'🇲🇦','Senegal':'🇸🇳','Ecuador':'🇪🇨',
     'Croatia':'🇭🇷','Switzerland':'🇨🇭','Poland':'🇵🇱','Denmark':'🇩🇰',
@@ -316,22 +300,22 @@
     'Austria':'🇦🇹','Hungary':'🇭🇺','Romania':'🇷🇴','Ukraine':'🇺🇦',
     'Turkey':'🇹🇷','Greece':'🇬🇷','Albania':'🇦🇱','Paraguay':'🇵🇾',
     'Chile':'🇨🇱','Bolivia':'🇧🇴','Honduras':'🇭🇳','El Salvador':'🇸🇻',
-    'Jamaica':'🇯🇲','Cuba':'🇨🇺','Indonesia':'🇮🇩','Thailand':'🇹🇭',
-    'Vietnam':'🇻🇳','China PR':'🇨🇳','China':'🇨🇳','India':'🇮🇳',
-    'Iraq':'🇮🇶','Jordan':'🇯🇴','UAE':'🇦🇪','Kuwait':'🇰🇼',
-    'Bahrain':'🇧🇭','Oman':'🇴🇲','Afghanistan':'🇦🇫','Azerbaijan':'🇦🇿',
-    'Georgia':'🇬🇪','Czechia':'🇨🇿','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Norway':'🇳🇴',
-    'Sweden':'🇸🇪','Finland':'🇫🇮','Iceland':'🇮🇸','Ireland':'🇮🇪',
-    'North Macedonia':'🇲🇰','Kosovo':'🇽🇰','Montenegro':'🇲🇪','Bosnia and Herzegovina':'🇧🇦',
+    'Jamaica':'🇯🇲','Indonesia':'🇮🇩','Thailand':'🇹🇭','Vietnam':'🇻🇳',
+    'China PR':'🇨🇳','China':'🇨🇳','Iraq':'🇮🇶','Jordan':'🇯🇴',
+    'UAE':'🇦🇪','Georgia':'🇬🇪','Czechia':'🇨🇿','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'Norway':'🇳🇴','Sweden':'🇸🇪','Finland':'🇫🇮','Iceland':'🇮🇸',
+    'Ireland':'🇮🇪','North Macedonia':'🇲🇰','Montenegro':'🇲🇪',
     'Curaçao':'🇨🇼','Haiti':'🇭🇹','Trinidad and Tobago':'🇹🇹','Guatemala':'🇬🇹',
+    'Bahrain':'🇧🇭','Oman':'🇴🇲','Kuwait':'🇰🇼','Azerbaijan':'🇦🇿',
   };
-  function getFlag(n){ return FLAGS[n]||'🏳️'; }
+  const f = n => FLAGS[n]||'🏳️';
+
   function initials(n){
     if(!n)return'??';
     const p=n.trim().split(' ');
     return p.length===1?p[0].slice(0,2).toUpperCase():(p[0][0]+p[p.length-1][0]).toUpperCase();
   }
-  function showToast(msg,type='info'){
+  function showToast(msg){
     const el=document.getElementById('toast');
     if(!el)return;
     el.textContent=msg;
@@ -339,8 +323,6 @@
     clearTimeout(el._t);
     el._t=setTimeout(()=>el.classList.remove('show'),3500);
   }
-
-  // ===== API =====
   async function apiFD(path){
     try{
       const r=await fetch('/api/fd?path='+encodeURIComponent(path));
@@ -362,7 +344,7 @@
     const {data:{session}}=await sb.auth.getSession();
     if(!session){window.location.href='index.html';return;}
     currentUser=session.user;
-    sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT')window.location.href='index.html';});
+    sb.auth.onAuthStateChange(e=>{if(e==='SIGNED_OUT')window.location.href='index.html';});
     await loadProfile();
     initDarkMode();
     initUserMenu();
@@ -370,12 +352,11 @@
     startLiveScores();
   });
 
-  // ===== PROFILE =====
   async function loadProfile(){
     const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
     if(data){currentProfile=data;return;}
     const name=currentUser.user_metadata?.name||currentUser.user_metadata?.full_name||currentUser.email?.split('@')[0]||'Usuário';
-    const p={id:currentUser.id,name,email:currentUser.email,avatar_url:currentUser.user_metadata?.avatar_url||null,created_at:new Date().toISOString()};
+    const p={id:currentUser.id,name,email:currentUser.email,avatar_url:null,created_at:new Date().toISOString()};
     await sb.from('profiles').upsert(p);
     currentProfile=p;
   }
@@ -391,8 +372,6 @@
     document.addEventListener('click',()=>document.getElementById('userDropdown').classList.remove('open'));
   }
   async function doLogout(){await sb.auth.signOut();window.location.href='index.html';}
-
-  // ===== DARK MODE =====
   function initDarkMode(){if(localStorage.getItem('bolao_dark')==='true')applyDark(true);}
   function toggleDarkMode(){applyDark(!document.body.classList.contains('dark'));}
   function applyDark(on){
@@ -417,49 +396,51 @@
     btn.classList.add('active');
     document.getElementById('bs-'+id).classList.add('active');
   }
+  function switchPickemTab(id,btn){
+    document.querySelectorAll('.pickem-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.pickem-section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('ps-'+id).classList.add('active');
+  }
 
   // ===== LIVE SCORES =====
   async function startLiveScores(){
     await fetchLiveScores();
-    liveInterval=setInterval(fetchLiveScores,60000);
+    setInterval(fetchLiveScores,60000);
   }
   async function fetchLiveScores(){
-    // Busca jogos de hoje
     const today=new Date().toISOString().split('T')[0];
     const data=await apiFD('competitions/'+WC+'/matches?dateFrom='+today+'&dateTo='+today);
     const bar=document.getElementById('liveBar');
     const container=document.getElementById('liveScoreBar');
-    const refreshEl=document.getElementById('lastRefresh');
     if(!data?.matches?.length){bar.style.display='none';return;}
     bar.style.display='block';
     const now=new Date();
-    refreshEl.textContent='Atualizado às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const matches=data.matches.sort((a,b)=>{
-      const order={IN_PLAY:0,PAUSED:1,FINISHED:2,TIMED:3,SCHEDULED:4};
-      return (order[a.status]??5)-(order[b.status]??5);
+    document.getElementById('lastRefresh').textContent='Atualizado às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const sorted=data.matches.sort((a,b)=>{
+      const o={IN_PLAY:0,PAUSED:1,FINISHED:2,TIMED:3,SCHEDULED:4};
+      return (o[a.status]??5)-(o[b.status]??5);
     });
-    container.innerHTML=matches.map(m=>{
+    container.innerHTML=sorted.map(m=>{
       const live=m.status==='IN_PLAY'||m.status==='PAUSED';
       const done=m.status==='FINISHED';
       const hs=m.score?.fullTime?.home??m.score?.halfTime?.home??null;
       const as=m.score?.fullTime?.away??m.score?.halfTime?.away??null;
       const showScore=live||done;
       const dotClass=live?'dot-live':done?'dot-finished':'dot-scheduled';
-      const time=live?(m.minute?m.minute+"'":m.status==='PAUSED'?'HT':'▶')
-        :done?'FT'
-        :new Date(m.utcDate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-      return `<div class="live-card ${live?'is-live':done?'is-finished':''}" onclick="switchBracketTab('knockout',document.querySelector('.bracket-tab:nth-child(2)'))">
-        <div class="live-status-dot ${dotClass}"></div>
+      const time=live?(m.minute?m.minute+"'":'▶'):done?'FT':new Date(m.utcDate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="live-card ${live?'is-live':''}">
+        <div class="live-dot-r ${dotClass}"></div>
         <div class="live-teams">
           <div class="live-team-row">
-            <span class="live-team-name">${getFlag(m.homeTeam?.name)} ${m.homeTeam?.shortName||m.homeTeam?.name||'?'}</span>
+            <span class="live-team-name">${f(m.homeTeam?.name)} ${m.homeTeam?.shortName||m.homeTeam?.name||'?'}</span>
             ${showScore?`<span class="live-team-score">${hs??0}</span>`:''}
           </div>
           <div class="live-team-row">
-            <span class="live-team-name">${getFlag(m.awayTeam?.name)} ${m.awayTeam?.shortName||m.awayTeam?.name||'?'}</span>
+            <span class="live-team-name">${f(m.awayTeam?.name)} ${m.awayTeam?.shortName||m.awayTeam?.name||'?'}</span>
             ${showScore?`<span class="live-team-score">${as??0}</span>`:''}
           </div>
-          <div class="live-meta">${live?`<span class="live-badge">AO VIVO ${time}</span>`:time} · ${m.group||m.stage||''}</div>
+          <div class="live-meta">${live?`<span class="live-badge">AO VIVO ${time}</span>`:time} · ${m.group?.replace('GROUP_','')||m.stage||''}</div>
         </div>
       </div>`;
     }).join('');
@@ -467,103 +448,74 @@
 
   // ===== BRACKETS =====
   async function loadBrackets(){
-    const [standing,matchesAll]=await Promise.all([
+    const [standing,matches]=await Promise.all([
       cachedFD('competitions/'+WC+'/standings'),
       cachedFD('competitions/'+WC+'/matches'),
     ]);
-    if(standing?.standings)renderGroups(standing.standings);
+    if(standing?.standings){realGroups=standing.standings;renderGroups(standing.standings);}
     else document.getElementById('groupsGrid').innerHTML='<div class="loading-state" style="color:var(--text-3)">Grupos indisponíveis</div>';
-    if(matchesAll?.matches)renderKnockout(matchesAll.matches);
+    if(matches?.matches){allMatches=matches.matches;renderKnockout(matches.matches);}
     else document.getElementById('knockoutTree').innerHTML='<div class="loading-state" style="color:var(--text-3)">Mata-mata indisponível</div>';
   }
 
   function renderGroups(standings){
     const el=document.getElementById('groupsGrid');
     const groups=standings.filter(s=>s.type==='TOTAL');
-    if(!groups.length){el.innerHTML='<div class="loading-state" style="color:var(--text-3)">Sem dados de grupos ainda</div>';return;}
+    if(!groups.length){el.innerHTML='<div class="loading-state" style="color:var(--text-3)">Sem dados</div>';return;}
     el.innerHTML=groups.map(g=>{
       const id=g.group?.replace('GROUP_','')||'?';
-      const teams=g.table||[];
       return `<div class="group-card">
-        <div class="group-head"><h3>Grupo ${id}</h3><span>${teams[0]?.playedGames||0} jogos</span></div>
+        <div class="group-head"><h3>Grupo ${id}</h3><span>${g.table?.[0]?.playedGames||0} jogos</span></div>
         <table class="group-table">
           <thead><tr><th>Time</th><th>J</th><th>SG</th><th>Pts</th></tr></thead>
-          <tbody>${teams.map((t,i)=>{
+          <tbody>${(g.table||[]).map((t,i)=>{
             const sg=t.goalsFor-t.goalsAgainst;
-            // Top 2 classificam, top 8 terceiros também (Copa 2026 tem 48 times)
             const dotClass=i<2?'q-dot':i===2?'t3-dot':'e-dot';
-            return `<tr>
-              <td><div class="team-cell">
-                <div class="${dotClass}"></div>
-                <span>${getFlag(t.team?.name)}</span>
-                <span style="font-weight:${i<2?700:400}">${t.team?.name}</span>
-              </div></td>
-              <td>${t.playedGames}</td>
-              <td>${sg>=0?'+'+sg:sg}</td>
-              <td><strong>${t.points}</strong></td>
-            </tr>`;
+            return `<tr><td><div class="team-cell">
+              <div class="${dotClass}"></div>
+              <span>${f(t.team?.name)}</span>
+              <span style="font-weight:${i<2?700:400}">${t.team?.name}</span>
+            </div></td>
+            <td>${t.playedGames}</td>
+            <td>${sg>=0?'+'+sg:sg}</td>
+            <td><strong>${t.points}</strong></td></tr>`;
           }).join('')}</tbody>
         </table>
       </div>`;
     }).join('');
   }
 
-  function renderKnockout(allMatches){
+  function renderKnockout(matches){
     const el=document.getElementById('knockoutTree');
     const stageOrder=['ROUND_OF_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
-    const stageLabels={
-      ROUND_OF_32:'Fase de 32',LAST_16:'Oitavas',
-      QUARTER_FINALS:'Quartas',SEMI_FINALS:'Semifinal',
-      THIRD_PLACE:'3º Lugar',FINAL:'Final'
-    };
-    // Filtra só mata-mata
-    const koStages=['ROUND_OF_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+    const stageLabels={ROUND_OF_32:'Fase 32',LAST_16:'Oitavas',QUARTER_FINALS:'Quartas',SEMI_FINALS:'Semifinal',THIRD_PLACE:'3º Lugar',FINAL:'Final'};
     const byStage={};
-    allMatches.forEach(m=>{
-      if(!koStages.includes(m.stage))return;
+    matches.forEach(m=>{
+      if(!stageOrder.includes(m.stage))return;
       if(!byStage[m.stage])byStage[m.stage]=[];
       byStage[m.stage].push(m);
     });
     const stages=stageOrder.filter(s=>byStage[s]?.length);
-    if(!stages.length){
-      el.innerHTML='<div class="loading-state" style="color:var(--text-3)">Mata-mata ainda não começou</div>';
-      return;
-    }
-
-    // Acha campeão
+    if(!stages.length){el.innerHTML='<div class="loading-state" style="color:var(--text-3)">Mata-mata ainda não começou</div>';return;}
     const finalMatch=byStage['FINAL']?.[0];
     let champion='?';
     if(finalMatch?.status==='FINISHED'){
-      const hs=finalMatch.score?.fullTime?.home??0;
-      const as=finalMatch.score?.fullTime?.away??0;
+      const hs=finalMatch.score?.fullTime?.home??0,as=finalMatch.score?.fullTime?.away??0;
       const pen=finalMatch.score?.penalties;
-      if(pen){champion=pen.home>pen.away?finalMatch.homeTeam?.name:finalMatch.awayTeam?.name;}
-      else{champion=hs>as?finalMatch.homeTeam?.name:finalMatch.awayTeam?.name;}
+      champion=pen?(pen.home>pen.away?finalMatch.homeTeam?.name:finalMatch.awayTeam?.name):(hs>as?finalMatch.homeTeam?.name:finalMatch.awayTeam?.name);
     }
-
     let html='<div class="ko-tree">';
     stages.forEach(stage=>{
-      const matches=byStage[stage];
-      html+=`<div class="ko-col">
-        <div class="ko-col-head">${stageLabels[stage]||stage}</div>
-        <div class="ko-col-matches">`;
-      matches.forEach(m=>{
-        html+=renderKoCard(m,stage==='FINAL');
-      });
+      html+=`<div class="ko-col"><div class="ko-col-head">${stageLabels[stage]}</div><div class="ko-col-matches">`;
+      byStage[stage].forEach(m=>{html+=renderKoCard(m,stage==='FINAL');});
       html+=`</div></div>`;
     });
-    // Coluna campeão
-    html+=`<div class="ko-col champion-col">
-      <div class="ko-col-head">Campeão</div>
-      <div class="champion-inner">
-        <div class="champion-box">
-          <span class="champion-trophy">🏆</span>
-          <div class="champion-label">Campeão</div>
-          <div class="champion-name">${getFlag(champion)} ${champion}</div>
-        </div>
-      </div>
-    </div>`;
-    html+='</div>';
+    html+=`<div class="ko-col champion-col"><div class="ko-col-head">Campeão</div>
+      <div class="champion-inner"><div class="champion-box">
+        <span class="champion-trophy">🏆</span>
+        <div class="champion-label">Campeão</div>
+        <div class="champion-name">${f(champion)} ${champion}</div>
+      </div></div></div></div>`;
     el.innerHTML=html;
   }
 
@@ -574,185 +526,297 @@
     const as=done||live?m.score?.fullTime?.away??m.score?.halfTime?.away??null:null;
     const pen=m.score?.penalties;
     const hPen=pen?.home,aPen=pen?.away;
-    const hWin=done&&(pen?(hPen>aPen):(hs>as));
-    const aWin=done&&(pen?(aPen>hPen):(as>hs));
+    const hWin=done&&(pen?hPen>aPen:hs>as);
+    const aWin=done&&(pen?aPen>hPen:as>hs);
     const hName=m.homeTeam?.name||'TBD';
     const aName=m.awayTeam?.name||'TBD';
     const isTbd=hName==='TBD'||aName==='TBD';
-    const liveTime=live?(m.minute?m.minute+"'":"▶"):'';
     return `<div class="ko-match-card${isFinal?' final-card':''}${live?' is-live':''}">
-      ${live?`<div style="padding:2px 8px;background:#ef4444;text-align:center"><span style="font-size:0.6rem;color:#fff;font-weight:800">● AO VIVO ${liveTime}</span></div>`:''}
+      ${live?`<div style="padding:2px 8px;background:#ef4444;text-align:center"><span style="font-size:0.6rem;color:#fff;font-weight:800">● AO VIVO${m.minute?' '+m.minute+"'":''}  </span></div>`:''}
       <div class="ko-row ${hWin?'winner':done&&!hWin?'loser':''}">
-        <div class="ko-row-left">
-          <span class="ko-name ${isTbd?'ko-tbd':''}">${isTbd?'A definir':getFlag(hName)+' '+hName}</span>
-        </div>
-        ${hs!==null?`<div style="display:flex;align-items:center;gap:3px">
-          ${hPen!=null?`<span class="ko-pen-badge">${hPen}p</span>`:''}
-          <span class="ko-sc">${hs}</span>
-        </div>`:''}
+        <span class="ko-name ${isTbd?'ko-tbd':''}">${isTbd?'A definir':f(hName)+' '+hName}</span>
+        ${hs!==null?`<div style="display:flex;align-items:center;gap:3px">${hPen!=null?`<span class="ko-pen">${hPen}p</span>`:''}<span class="ko-sc">${hs}</span></div>`:''}
       </div>
       <div class="ko-row ${aWin?'winner':done&&!aWin?'loser':''}">
-        <div class="ko-row-left">
-          <span class="ko-name ${isTbd?'ko-tbd':''}">${isTbd?'A definir':getFlag(aName)+' '+aName}</span>
-        </div>
-        ${as!==null?`<div style="display:flex;align-items:center;gap:3px">
-          ${aPen!=null?`<span class="ko-pen-badge">${aPen}p</span>`:''}
-          <span class="ko-sc">${as}</span>
-        </div>`:''}
+        <span class="ko-name ${isTbd?'ko-tbd':''}">${isTbd?'A definir':f(aName)+' '+aName}</span>
+        ${as!==null?`<div style="display:flex;align-items:center;gap:3px">${aPen!=null?`<span class="ko-pen">${aPen}p</span>`:''}<span class="ko-sc">${as}</span></div>`:''}
       </div>
     </div>`;
   }
 
   // ===== PICK'EM =====
   async function loadPickem(){
-    if(pickemLoaded){renderPickemStats();return;}
-    const el=document.getElementById('pickemGrid');
-    el.innerHTML='<div class="loading-state"><div class="spinner"></div> Carregando...</div>';
-    const data=await cachedFD('competitions/'+WC+'/matches');
-    const koStages=['ROUND_OF_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','FINAL'];
-    if(data?.matches){
-      pickemMatches=data.matches
-        .filter(m=>koStages.includes(m.stage))
-        .map(m=>{
-          const done=m.status==='FINISHED';
-          const live=m.status==='IN_PLAY'||m.status==='PAUSED';
-          const hs=m.score?.fullTime?.home,as=m.score?.fullTime?.away;
-          const pen=m.score?.penalties;
-          const penWinner=pen?(pen.home>pen.away?m.homeTeam?.name:m.awayTeam?.name):null;
-          const winner=done?(penWinner||(hs>as?m.homeTeam?.name:m.awayTeam?.name)):null;
-          const labels={ROUND_OF_32:'Fase de 32',LAST_16:'Oitavas',QUARTER_FINALS:'Quartas',SEMI_FINALS:'Semifinal',FINAL:'Final'};
-          return {
-            id:String(m.id),label:labels[m.stage]||m.stage,
-            home:m.homeTeam?.name||'TBD',away:m.awayTeam?.name||'TBD',
-            status:done?'done':live?'live':'pending',
-            winner,homeScore:hs,awayScore:as
-          };
-        });
-    }else{pickemMatches=FALLBACK_PICKEM;}
+    if(pickemLoaded){calcAndRenderScore();return;}
+    // Carrega dados da API se ainda não tiver
+    if(!realGroups.length||!allMatches.length){
+      const [standing,matches]=await Promise.all([
+        cachedFD('competitions/'+WC+'/standings'),
+        cachedFD('competitions/'+WC+'/matches'),
+      ]);
+      if(standing?.standings){realGroups=standing.standings;}
+      if(matches?.matches){allMatches=matches.matches;}
+    }
+    // Carrega palpites salvos
     if(currentUser){
-      const {data:picks}=await sb.from('picks').select('*').eq('user_id',currentUser.id);
-      if(picks)picks.forEach(p=>{userPicks[p.match_id]=p.picked_team;});
+      const {data}=await sb.from('user_picks').select('*').eq('user_id',currentUser.id).single();
+      if(data){
+        if(data.group_picks)groupPicks=data.group_picks;
+        if(data.ko_picks)koPicks=data.ko_picks;
+      }
     }
     pickemLoaded=true;
-    renderPickem();
+    renderGroupPicks();
+    renderKOPicks();
+    calcAndRenderScore();
   }
 
-  const FALLBACK_PICKEM=[
-    {id:'f_final',label:'Final',home:'Argentina',away:'France',status:'done',winner:'Argentina',homeScore:3,awayScore:3},
-    {id:'f_sf1',label:'Semifinal',home:'Argentina',away:'Croatia',status:'done',winner:'Argentina',homeScore:3,awayScore:0},
-    {id:'f_sf2',label:'Semifinal',home:'France',away:'Morocco',status:'done',winner:'France',homeScore:2,awayScore:0},
-    {id:'f_qf1',label:'Quartas',home:'Netherlands',away:'Argentina',status:'done',winner:'Argentina',homeScore:2,awayScore:2},
-    {id:'f_r1',label:'Oitavas',home:'Brazil',away:'South Korea',status:'done',winner:'Brazil',homeScore:4,awayScore:1},
-    {id:'f_r2',label:'Oitavas',home:'Morocco',away:'Spain',status:'pending',winner:null},
+  // ---- GROUP PICKS ----
+  function renderGroupPicks(){
+    const el=document.getElementById('pickGroupsGrid');
+    const groups=realGroups.filter(s=>s.type==='TOTAL');
+    if(!groups.length){
+      el.innerHTML='<div class="loading-state" style="color:var(--text-3)">Grupos indisponíveis</div>';
+      return;
+    }
+    el.innerHTML=groups.map(g=>{
+      const gId=g.group?.replace('GROUP_','')||'?';
+      const realOrder=(g.table||[]).map(t=>t.team?.name);
+      // Use pick order if exists, else use current API order
+      const pickOrder=groupPicks[gId]?.[...groupPicks[gId]]:[...realOrder];
+      // Ensure all teams are in pickOrder
+      realOrder.forEach(t=>{if(!pickOrder.includes(t))pickOrder.push(t);});
+
+      const groupDone=g.table?.every(t=>t.playedGames>=3);
+      let statusText=groupDone?'Encerrado':'Em andamento';
+      let statusColor=groupDone?'rgba(22,163,74,0.2)':'rgba(212,175,55,0.2)';
+
+      return `<div class="pick-group-card">
+        <div class="pick-group-head">
+          <h4>Grupo ${gId}</h4>
+          <span class="pick-group-status" style="background:${statusColor}">${statusText}</span>
+        </div>
+        <ul class="pick-team-list" id="group-list-${gId}" data-group="${gId}">
+          ${pickOrder.map((team,i)=>{
+            const posClass=['p1','p2','p3','p4'][i]||'p4';
+            // Compara com resultado real
+            const realPos=realOrder.indexOf(team);
+            let resultBadge='';
+            if(groupDone){
+              if(realPos===i)resultBadge=`<span class="pick-result-badge correct">+3pts</span>`;
+              else if((realPos<2&&i<2)||(realPos>=2&&i>=2))resultBadge=`<span class="pick-result-badge partial">+1pt</span>`;
+              else resultBadge=`<span class="pick-result-badge wrong">0</span>`;
+            }
+            return `<li class="pick-team-item" draggable="true"
+              data-team="${team}" data-group="${gId}"
+              ondragstart="onDragStart(event)"
+              ondragover="onDragOver(event)"
+              ondrop="onDrop(event,this)"
+              ondragend="onDragEnd(event)">
+              <div class="pick-pos ${posClass}">${i+1}</div>
+              <span class="drag-handle">⠿</span>
+              <span class="pick-team-name">${f(team)} ${team}</span>
+              ${resultBadge}
+            </li>`;
+          }).join('')}
+        </ul>
+      </div>`;
+    }).join('');
+  }
+
+  // DRAG AND DROP
+  let dragSrc=null;
+  function onDragStart(e){
+    dragSrc=e.currentTarget;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  }
+  function onDragOver(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect='move';
+    const li=e.currentTarget;
+    if(li!==dragSrc)li.classList.add('drag-over');
+  }
+  function onDrop(e,target){
+    e.preventDefault();
+    if(!dragSrc||dragSrc===target)return;
+    if(dragSrc.dataset.group!==target.dataset.group)return;
+    const list=target.parentNode;
+    const items=[...list.children];
+    const srcIdx=items.indexOf(dragSrc);
+    const tgtIdx=items.indexOf(target);
+    if(srcIdx<tgtIdx)list.insertBefore(dragSrc,target.nextSibling);
+    else list.insertBefore(dragSrc,target);
+    // Update pick state
+    const gId=dragSrc.dataset.group;
+    groupPicks[gId]=[...list.children].map(li=>li.dataset.team);
+    // Re-render position numbers
+    [...list.children].forEach((li,i)=>{
+      const pos=li.querySelector('.pick-pos');
+      pos.className='pick-pos '+(['p1','p2','p3','p4'][i]||'p4');
+      pos.textContent=i+1;
+    });
+    calcAndRenderScore();
+  }
+  function onDragEnd(e){
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  }
+
+  // ---- KO PICKS ----
+  const KO_PHASES=[
+    {id:'ROUND_OF_32',label:'Fase de 32',desc:'16 jogos'},
+    {id:'LAST_16',label:'Oitavas de Final',desc:'8 jogos'},
+    {id:'QUARTER_FINALS',label:'Quartas de Final',desc:'4 jogos'},
+    {id:'SEMI_FINALS',label:'Semifinal',desc:'2 jogos'},
+    {id:'FINAL',label:'Final',desc:'1 jogo'},
   ];
 
-  function renderPickem(){
-    renderPickemStats();
-    const el=document.getElementById('pickemGrid');
-    const order=['Final','Semifinal','Quartas','Oitavas','Fase de 32'];
-    const grouped={};
-    pickemMatches.forEach(m=>{if(!grouped[m.label])grouped[m.label]=[];grouped[m.label].push(m);});
-    let html='';
-    order.forEach(phase=>{
-      if(!grouped[phase])return;
-      html+=`<div class="section-label" style="grid-column:1/-1">${phase}</div>`;
-      grouped[phase].forEach(m=>{html+=renderPickCard(m);});
+  function renderKOPicks(){
+    const el=document.getElementById('pickKOGrid');
+    const byStage={};
+    allMatches.forEach(m=>{
+      if(!KO_PHASES.find(p=>p.id===m.stage))return;
+      if(!byStage[m.stage])byStage[m.stage]=[];
+      byStage[m.stage].push(m);
     });
-    el.innerHTML=html||'<div class="loading-state" style="color:var(--text-3)">Nenhum jogo de mata-mata ainda</div>';
+
+    // Se nenhuma fase de KO ainda, mostra formulário pré-preenchido com placeholders
+    let hasAnyKO=KO_PHASES.some(p=>byStage[p.id]?.length);
+
+    if(!hasAnyKO){
+      el.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;box-shadow:var(--shadow-sm)">
+        <div style="font-size:2rem;margin-bottom:12px">⏳</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px">Mata-mata ainda não começou</h3>
+        <p style="font-size:0.85rem;color:var(--text-3)">Os confrontos serão definidos após a fase de grupos.<br>Volte aqui para palpitar quando os jogos forem anunciados!</p>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML=KO_PHASES.map(phase=>{
+      const matches=byStage[phase.id];
+      if(!matches?.length)return'';
+      return `<div class="pick-ko-phase">
+        <div class="pick-ko-phase-head">
+          <h4>${phase.label}</h4>
+          <span style="font-size:0.72rem;color:var(--text-3)">${phase.desc}</span>
+        </div>
+        <div class="pick-ko-matches">
+          ${matches.map(m=>renderKOPickMatch(m,phase.id)).join('')}
+        </div>
+      </div>`;
+    }).join('');
   }
 
-  function renderPickCard(m){
-    const pick=userPicks[m.id];
-    const isDone=m.status==='done',isLive=m.status==='live';
-    const isCorrect=isDone&&pick&&pick===m.winner;
-    const isWrong=isDone&&pick&&pick!==m.winner;
-    let bc='badge-pending',bt='Aguardando';
-    if(isCorrect){bc='badge-correct';bt='✓ Acertou!';}
-    else if(isWrong){bc='badge-wrong';bt='✗ Errou';}
-    else if(isLive){bc='badge-live';bt='● Ao Vivo';}
-    else if(pick&&!isDone){bt='💾 Salvo';}
+  function renderKOPickMatch(m,stageId){
+    const matchKey=stageId+'_'+m.id;
+    const pick=koPicks[matchKey];
+    const done=m.status==='FINISHED';
+    const live=m.status==='IN_PLAY'||m.status==='PAUSED';
+    const hs=m.score?.fullTime?.home??0,as=m.score?.fullTime?.away??0;
+    const pen=m.score?.penalties;
+    const penWinner=pen?(pen.home>pen.away?m.homeTeam?.name:m.awayTeam?.name):null;
+    const realWinner=done?(penWinner||(hs>as?m.homeTeam?.name:m.awayTeam?.name)):null;
+    const isCorrect=done&&pick&&pick===realWinner;
+    const isWrong=done&&pick&&pick!==realWinner;
+    const hName=m.homeTeam?.name||'TBD';
+    const aName=m.awayTeam?.name||'TBD';
+
     let resultHtml='';
-    if(isDone&&pick){
-      resultHtml=`<div class="pick-result-row"><span class="pick-result-label">Resultado</span><span class="pick-result-neutral">${getFlag(m.winner)} ${m.winner}</span></div>
-      <div class="pick-result-row"><span class="pick-result-label">Palpite</span><span class="${isCorrect?'pick-result-correct':'pick-result-wrong'}">${getFlag(pick)} ${pick}</span></div>`;
-    }else if(isDone&&!pick){
-      resultHtml=`<div class="pick-result-row"><span class="pick-result-label">Resultado</span><span class="pick-result-neutral">${getFlag(m.winner)} ${m.winner}</span></div>
-      <div class="pick-result-row"><span class="pick-result-label">Palpite</span><span style="color:var(--text-3);font-style:italic">Não apostou</span></div>`;
+    if(done&&pick){
+      resultHtml=`<div class="pick-ko-result">
+        ${isCorrect
+          ?`<span style="color:var(--green);font-weight:700">✓ Acertou! +${stageId==='FINAL'?25:10}pts</span>`
+          :`<span style="color:var(--red);font-weight:700">✗ Errou — Ganhou: ${f(realWinner)} ${realWinner}</span>`
+        }
+      </div>`;
+    }else if(done&&!pick){
+      resultHtml=`<div class="pick-ko-result"><span style="color:var(--text-3);font-style:italic">Não palpitou — Ganhou: ${f(realWinner)} ${realWinner}</span></div>`;
+    }else if(live){
+      resultHtml=`<div class="pick-ko-result"><span class="live-badge">AO VIVO</span></div>`;
     }
-    const canPick=!isDone&&!isLive&&m.home!=='TBD';
-    let actionHtml='';
-    if(canPick&&!pick){
-      actionHtml=`<div class="pick-action"><select id="sel-${m.id}">
-        <option value="">Escolha o vencedor</option>
-        <option value="${m.home}">${getFlag(m.home)} ${m.home}</option>
-        <option value="${m.away}">${getFlag(m.away)} ${m.away}</option>
-      </select><button class="btn-pick-save" onclick="savePick('${m.id}')">Salvar</button></div>`;
-    }else if(pick&&!isDone){
-      actionHtml=`<div class="pick-saved-pick">Palpite: ${getFlag(pick)} <strong>${pick}</strong></div>`;
-    }else if(m.home==='TBD'){
-      actionHtml=`<div class="pick-saved-pick" style="color:var(--text-3)">Aguardando definição dos times</div>`;
-    }
-    const scoreHtml=isDone&&m.homeScore!=null
-      ?`<span style="font-size:0.75rem;font-weight:800;color:var(--gold)">${m.homeScore} × ${m.awayScore}</span>`
-      :isLive?`<span class="live-badge">AO VIVO</span>`
-      :'<span class="pick-vs">VS</span>';
-    return `<div class="pick-card${isCorrect?' correct':isWrong?' wrong':''}">
-      <div class="pick-card-header"><h4>${m.label}</h4><span class="badge ${bc}">${bt}</span></div>
-      <div class="pick-matchup">
-        <div class="pick-team-side"><span>${getFlag(m.home)}</span><span class="pick-team-name">${m.home}</span></div>
-        ${scoreHtml}
-        <div class="pick-team-side right"><span class="pick-team-name">${m.away}</span><span>${getFlag(m.away)}</span></div>
+
+    return `<div class="pick-ko-match">
+      <div class="pick-ko-vs">
+        <span class="pick-ko-team">${f(hName)} ${hName}</span>
+        <span class="pick-ko-sep">×</span>
+        <span class="pick-ko-team">${f(aName)} ${aName}</span>
       </div>
-      ${resultHtml}${actionHtml}
+      <div class="pick-ko-select">
+        ${done
+          ? `<span style="font-size:0.82rem;font-weight:600;color:${isCorrect?'var(--green)':isWrong?'var(--red)':'var(--text-3)'}">${pick?f(pick)+' '+pick:'Sem palpite'}</span>`
+          : `<select onchange="setKOPick('${matchKey}',this.value)">
+              <option value="">Escolha o vencedor</option>
+              ${hName!=='TBD'?`<option value="${hName}" ${pick===hName?'selected':''}>${f(hName)} ${hName}</option>`:''}
+              ${aName!=='TBD'?`<option value="${aName}" ${pick===aName?'selected':''}>${f(aName)} ${aName}</option>`:''}
+            </select>`
+        }
+      </div>
+      ${resultHtml}
     </div>`;
   }
 
-  function renderPickemStats(){
-    let correct=0,wrong=0,pending=0;
-    pickemMatches.forEach(m=>{
-      const p=userPicks[m.id];
-      if(m.status==='done'){if(!p)pending++;else if(p===m.winner)correct++;else wrong++;}
-      else pending++;
+  function setKOPick(key,value){
+    if(value)koPicks[key]=value;
+    else delete koPicks[key];
+    calcAndRenderScore();
+  }
+
+  // ---- SCORE CALC ----
+  function calcAndRenderScore(){
+    let groupPts=0,koPts=0,champPts=0;
+
+    // Grupos
+    realGroups.filter(s=>s.type==='TOTAL').forEach(g=>{
+      const gId=g.group?.replace('GROUP_','')||'?';
+      const realOrder=(g.table||[]).map(t=>t.team?.name);
+      const pickOrder=groupPicks[gId]||[];
+      const done=g.table?.every(t=>t.playedGames>=3);
+      if(!done)return;
+      pickOrder.forEach((team,i)=>{
+        const realPos=realOrder.indexOf(team);
+        if(realPos===i)groupPts+=3;
+        else if((realPos<2&&i<2)||(realPos>=2&&i>=2))groupPts+=1;
+      });
     });
-    document.getElementById('statPts').textContent=correct*10;
-    document.getElementById('statCorrect').textContent=correct;
-    document.getElementById('statWrong').textContent=wrong;
-    document.getElementById('statPending').textContent=pending;
+
+    // KO
+    const finalMatchId=allMatches.find(m=>m.stage==='FINAL')?.id;
+    allMatches.forEach(m=>{
+      if(!KO_PHASES.find(p=>p.id===m.stage))return;
+      if(m.status!=='FINISHED')return;
+      const matchKey=m.stage+'_'+m.id;
+      const pick=koPicks[matchKey];
+      if(!pick)return;
+      const hs=m.score?.fullTime?.home??0,as=m.score?.fullTime?.away??0;
+      const pen=m.score?.penalties;
+      const penWinner=pen?(pen.home>pen.away?m.homeTeam?.name:m.awayTeam?.name):null;
+      const realWinner=penWinner||(hs>as?m.homeTeam?.name:m.awayTeam?.name);
+      if(pick===realWinner){
+        if(m.stage==='FINAL'){champPts+=25;}
+        else{koPts+=10;}
+      }
+    });
+
+    document.getElementById('statGroup').textContent=groupPts;
+    document.getElementById('statKO').textContent=koPts;
+    document.getElementById('statChamp').textContent=champPts;
+    document.getElementById('statTotal').textContent=groupPts+koPts+champPts;
   }
 
-  async function savePick(matchId){
-    const sel=document.getElementById('sel-'+matchId);
-    if(!sel?.value){showToast('Escolha um vencedor!');return;}
-    const {error}=await sb.from('picks').upsert({user_id:currentUser.id,match_id:matchId,picked_team:sel.value,updated_at:new Date().toISOString()},{onConflict:'user_id,match_id'});
-    if(error){showToast('Erro: '+error.message);return;}
-    userPicks[matchId]=sel.value;
-    showToast('Salvo: '+getFlag(sel.value)+' '+sel.value+' ✓');
-    await updateUserScore();
-    renderPickem();
-  }
-
+  // ---- SAVE ----
   async function saveAllPicks(){
-    const selects=document.querySelectorAll('[id^="sel-"]');
-    const ups=[];
-    selects.forEach(sel=>{
-      if(!sel.value)return;
-      const mid=sel.id.replace('sel-','');
-      if(userPicks[mid])return;
-      userPicks[mid]=sel.value;
-      ups.push({user_id:currentUser.id,match_id:mid,picked_team:sel.value,updated_at:new Date().toISOString()});
-    });
-    if(!ups.length){showToast('Nada novo para salvar.');return;}
-    const {error}=await sb.from('picks').upsert(ups,{onConflict:'user_id,match_id'});
-    if(error){showToast('Erro: '+error.message);return;}
-    await updateUserScore();
-    showToast(ups.length+' palpite(s) salvo(s)! ✓');
-    renderPickem();
-  }
-
-  async function updateUserScore(){
-    let correct=0;
-    pickemMatches.forEach(m=>{if(m.status==='done'&&userPicks[m.id]===m.winner)correct++;});
-    await sb.from('profiles').update({score:correct*10,correct_picks:correct}).eq('id',currentUser.id);
+    if(!currentUser){showToast('Faça login primeiro.');return;}
+    const {error}=await sb.from('user_picks').upsert({
+      user_id:currentUser.id,
+      group_picks:groupPicks,
+      ko_picks:koPicks,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id'});
+    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    // Atualiza score no perfil
+    const total=parseInt(document.getElementById('statTotal').textContent)||0;
+    await sb.from('profiles').update({score:total}).eq('id',currentUser.id);
+    showToast('Palpites salvos! 💾');
   }
 
   // ===== RANKING =====
@@ -763,7 +827,6 @@
     if(error||!data?.length){renderRankingFallback(el);return;}
     renderRankingData(el,data);
   }
-
   function renderRankingData(el,users){
     const medals=['🥇','🥈','🥉'];
     let html='<div class="ranking-card">';
@@ -782,14 +845,12 @@
     html+='</div>';
     el.innerHTML=html;
   }
-
   function renderRankingFallback(el){
-    const demo=[
+    renderRankingData(el,[
       {id:'1',name:'Pedro Alves',score:120,correct_picks:12},
       {id:'2',name:'Maria Costa',score:100,correct_picks:10},
       {id:'3',name:'João Silva',score:90,correct_picks:9},
-    ];
-    renderRankingData(el,demo);
+    ]);
   }
   </script>
 </body>
