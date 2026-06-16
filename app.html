@@ -102,7 +102,7 @@
   const SUPABASE_ANON_KEY = 'sb_publishable_GD9R_nDQNxlZY5F0lNaCnw_CUAKm6eX';
   const FD_BASE = 'https://api.football-data.org/v4';
   const FD_TOKEN = '06f91a53d7ff4718a498803703571a46';
-  const WC_COMPETITION_ID = 'WC';
+  const WC_COMPETITION_ID = 2000;
 
   let sb, currentUser, currentProfile;
   let pickemMatches = [], userPicks = {}, pickemLoaded = false;
@@ -135,7 +135,7 @@
   }
   async function apiFD(path) {
     try {
-      const r = await fetch(FD_BASE + path, { headers: { 'X-Auth-Token': FD_TOKEN } });
+      const r = await fetch('/api/fd?path=' + encodeURIComponent(path));
       if (!r.ok) return null;
       return r.json();
     } catch(e) { return null; }
