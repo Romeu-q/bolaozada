@@ -487,8 +487,8 @@
 
   function renderKnockout(matches){
     const el=document.getElementById('knockoutTree');
-    const stageOrder=['ROUND_OF_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
-    const stageLabels={ROUND_OF_32:'Fase 32',LAST_16:'Oitavas',QUARTER_FINALS:'Quartas',SEMI_FINALS:'Semifinal',THIRD_PLACE:'3º Lugar',FINAL:'Final'};
+    const stageOrder=['ROUND_OF_32','ROUND_OF_16','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+    const stageLabels={ROUND_OF_32:'Fase de 32',ROUND_OF_16:'Fase de 16',LAST_16:'Oitavas',QUARTER_FINALS:'Quartas',SEMI_FINALS:'Semifinal',THIRD_PLACE:'3º Lugar',FINAL:'Final'};
     const byStage={};
     matches.forEach(m=>{
       if(!stageOrder.includes(m.stage))return;
@@ -664,7 +664,8 @@
 
   // ---- KO PICKS ----
   const KO_PHASES=[
-    {id:'ROUND_OF_32',label:'Fase de 32',desc:'16 jogos'},
+    {id:'ROUND_OF_32',label:'Fase de 32',desc:'32 jogos'},
+    {id:'ROUND_OF_16',label:'Fase de 16',desc:'16 jogos'},
     {id:'LAST_16',label:'Oitavas de Final',desc:'8 jogos'},
     {id:'QUARTER_FINALS',label:'Quartas de Final',desc:'4 jogos'},
     {id:'SEMI_FINALS',label:'Semifinal',desc:'2 jogos'},
@@ -683,27 +684,43 @@
     // Se nenhuma fase de KO ainda, mostra formulário pré-preenchido com placeholders
     let hasAnyKO=KO_PHASES.some(p=>byStage[p.id]?.length);
 
-    if(!hasAnyKO){
-      el.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;text-align:center;box-shadow:var(--shadow-sm)">
-        <div style="font-size:2rem;margin-bottom:12px">⏳</div>
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px">Mata-mata ainda não começou</h3>
-        <p style="font-size:0.85rem;color:var(--text-3)">Os confrontos serão definidos após a fase de grupos.<br>Volte aqui para palpitar quando os jogos forem anunciados!</p>
-      </div>`;
-      return;
-    }
+    // Número de jogos por fase para Copa 2026
+    const phaseMatchCount={ROUND_OF_32:32,ROUND_OF_16:16,LAST_16:8,QUARTER_FINALS:4,SEMI_FINALS:2,FINAL:1};
 
-    el.innerHTML=KO_PHASES.map(phase=>{
-      const matches=byStage[phase.id];
-      if(!matches?.length)return'';
-      return `<div class="pick-ko-phase">
-        <div class="pick-ko-phase-head">
-          <h4>${phase.label}</h4>
-          <span style="font-size:0.72rem;color:var(--text-3)">${phase.desc}</span>
-        </div>
-        <div class="pick-ko-matches">
-          ${matches.map(m=>renderKOPickMatch(m,phase.id)).join('')}
-        </div>
-      </div>`;
+    el.innerHTML=KO_PHASES.map(function(phase){
+      const matches=byStage[phase.id]||[];
+      const count=phaseMatchCount[phase.id]||0;
+
+      // Se tem jogos reais, usa eles; se não, cria placeholders
+      if(matches.length>0){
+        return '<div class="pick-ko-phase">'
+          +'<div class="pick-ko-phase-head"><h4>'+phase.label+'</h4><span style="font-size:0.72rem;color:var(--text-3)">'+matches.length+' jogos</span></div>'
+          +'<div class="pick-ko-matches">'+matches.map(function(m){return renderKOPickMatch(m,phase.id);}).join('')+'</div>'
+          +'</div>';
+      }else{
+        // Cria placeholders pra palpitar antes dos times serem definidos
+        const placeholders=[];
+        for(var i=0;i<count;i++){
+          const matchKey=phase.id+'_placeholder_'+i;
+          const pick=koPicks[matchKey];
+          placeholders.push(
+            '<div class="pick-ko-match">'
+            +'<div class="pick-ko-vs" style="flex:1">'
+            +'<span style="color:var(--text-3);font-size:0.8rem;font-style:italic">Jogo '+(i+1)+' — times a definir</span>'
+            +'</div>'
+            +'<div class="pick-ko-select">'
+            +'<input type="text" placeholder="Time que vai passar..." value="'+(pick||'')+'" '
+            +'oninput="setKOPick(''+matchKey+'',this.value)" '
+            +'style="padding:6px 10px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.8rem;font-family:inherit;outline:none;width:200px;">'
+            +'</div>'
+            +'</div>'
+          );
+        }
+        return '<div class="pick-ko-phase">'
+          +'<div class="pick-ko-phase-head"><h4>'+phase.label+'</h4><span style="font-size:0.72rem;color:var(--text-3)">'+count+' jogos — palpite livre</span></div>'
+          +'<div class="pick-ko-matches">'+placeholders.join('')+'</div>'
+          +'</div>';
+      }
     }).join('');
   }
 
